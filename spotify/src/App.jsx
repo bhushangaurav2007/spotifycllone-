@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 
-const API_URL = "http://localhost:3000"; // Change this if your backend runs on a different port
+const API_URL = "https://spotifycllone.onrender.com"; // Change this if your backend runs on a different port
 
 const App = () => {
   const [songs, setSongs] = useState([]);
