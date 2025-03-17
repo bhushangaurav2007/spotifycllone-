@@ -18,22 +18,20 @@ const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
 const STORAGE_TYPE = process.env.STORAGE_TYPE || "local"; // "local" or "cloudinary"
 
-// ✅ Debug: Check if environment variables are loading correctly
 console.log("🔍 Checking Environment Variables:");
 console.log("MONGO_URI:", MONGO_URI ? "✅ Loaded" : "❌ Missing");
 console.log("Cloud Name:", process.env.CLOUDINARY_CLOUD_NAME);
 console.log("API Key:", process.env.CLOUDINARY_API_KEY ? "✅ Loaded" : "❌ Missing");
 console.log("API Secret:", process.env.CLOUDINARY_API_SECRET ? "✅ Loaded" : "❌ Missing");
 
-// ✅ Connect to MongoDB
 let db, musicCollection, songsCollection;
 async function connectToMongoDB() {
     try {
         const client = new MongoClient(MONGO_URI);
         await client.connect();
         db = client.db("musicDB");
-        musicCollection = db.collection("music"); // Localhost songs
-        songsCollection = db.collection("songs"); // Cloudinary songs
+        musicCollection = db.collection("music");
+        songsCollection = db.collection("songs");
         console.log("✅ Connected to MongoDB!");
     } catch (err) {
         console.error("❌ MongoDB Connection Error:", err);
@@ -41,28 +39,28 @@ async function connectToMongoDB() {
     }
 }
 
-// ✅ Local Storage Setup (For localhost)
+// ✅ Local Storage Setup
 const SONGS_FOLDER = "./songsFolder";
 if (!fs.existsSync(SONGS_FOLDER)) fs.mkdirSync(SONGS_FOLDER, { recursive: true });
 
 const localStorage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, SONGS_FOLDER),
-    filename: (req, file, cb) => cb(null, file.originalname),
+    filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
+
 const localUpload = multer({ storage: localStorage });
 
-// ✅ Cloudinary Setup (For Render)
+// ✅ Cloudinary Setup
 if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
     console.error("❌ Cloudinary environment variables are missing! Check your Render settings.");
-    process.exit(1); // Stop the server if Cloudinary is not configured
+    process.exit(1);
 }
 
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,  // No fallback values!
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-
 
 const cloudinaryStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
@@ -74,72 +72,46 @@ const cloudinaryStorage = new CloudinaryStorage({
 });
 const cloudUpload = multer({ storage: cloudinaryStorage });
 
+// ✅ Corrected Upload Route
 app.post("/upload-songs", (req, res) => {
-    try {
-        const upload = STORAGE_TYPE === "cloudinary" ? cloudUpload.array("files", 10) : localUpload.array("files", 10);
+    const upload = STORAGE_TYPE === "cloudinary" ? cloudUpload.array("files", 10) : localUpload.array("files", 10);
 
-        upload(req, res, async (err) => {
-            if (err) {
-                console.error("❌ Upload Error:", err);
-                return res.status(500).json({ error: "❌ File upload failed!" });
-            }
+    upload(req, res, async (err) => {
+        if (err) {
+            console.error("❌ Upload Error:", err);
+            return res.status(400).json({ error: `Upload failed: ${err.message}` });
+        }
 
-            if (!req.files || req.files.length === 0) {
-                return res.status(400).json({ error: "❌ No files uploaded!" });
-            }
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ error: "❌ No files uploaded!" });
+        }
 
-            // ✅ Fix Cloudinary URL Issue
-            const uploadedSongs = req.files.map((file) => ({
-                title: file.originalname.replace(".mp3", ""),
-                filePath: STORAGE_TYPE === "cloudinary" ? file.path || file.secure_url : `/songs/${file.filename}`, // ✅ Cloudinary returns file.secure_url
-                storageType: STORAGE_TYPE,
-                createdAt: new Date(),
-            }));
+        const uploadedSongs = req.files.map((file) => ({
+            title: file.originalname.replace(".mp3", ""),
+            filePath: STORAGE_TYPE === "cloudinary" ? file.path || file.secure_url : `/songs/${file.filename}`,
+            storageType: STORAGE_TYPE,
+            createdAt: new Date(),
+        }));
 
-            await songsCollection.insertMany(uploadedSongs);
+        await songsCollection.insertMany(uploadedSongs);
 
-            console.log("✅ Songs Uploaded:", uploadedSongs);
-            res.status(201).json({ message: "✅ Songs uploaded successfully!", songs: uploadedSongs });
-        });
-    } catch (error) {
-        console.error("❌ Error uploading songs:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
+        console.log("✅ Songs Uploaded:", uploadedSongs);
+        res.status(201).json({ message: "✅ Songs uploaded successfully!", songs: uploadedSongs });
+    });
 });
 
-// ✅ Serve Songs (For localhost only)
+// ✅ Serving Songs for Localhost
 if (STORAGE_TYPE === "local") {
     app.use("/songs", express.static(SONGS_FOLDER));
 }
 
-// ✅ Get All Songs (For Localhost)
-app.get("/music", async (req, res) => {
-    try {
-        const songs = await musicCollection.find().toArray();
-        const formattedSongs = songs.map(song => ({
-            _id: song._id,
-            title: song.title,
-            url: `http://localhost:${PORT}${song.filePath}`,
-        }));
-        res.status(200).json(formattedSongs);
-    } catch (error) {
-        console.error("❌ Error fetching music:", error);
-        res.status(500).json({ error: "Internal Server Error" });
-    }
-});
-
-// ✅ Get All Cloudinary Songs (For Render)
+// ✅ Fetching Songs
 app.get("/musics", async (req, res) => {
     try {
         const songs = await songsCollection.find().toArray();
-        const formattedSongs = songs.map(song => ({
-            _id: song._id,
-            title: song.title,
-            url: song.filePath, // Cloudinary URL
-        }));
-        res.status(200).json(formattedSongs);
+        res.status(200).json(songs);
     } catch (error) {
-        console.error("❌ Error fetching cloudinary songs:", error);
+        console.error("❌ Error fetching songs:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
@@ -148,7 +120,7 @@ app.get("/musics", async (req, res) => {
 app.delete("/songs/:id", async (req, res) => {
     try {
         const { id } = req.params;
-        const song = await musicCollection.findOne({ _id: new ObjectId(id) }) || await songsCollection.findOne({ _id: new ObjectId(id) });
+        const song = await songsCollection.findOne({ _id: new ObjectId(id) });
 
         if (!song) return res.status(404).json({ error: "❌ Song not found!" });
 
@@ -162,7 +134,7 @@ app.delete("/songs/:id", async (req, res) => {
         } else {
             const localFilePath = path.join(SONGS_FOLDER, path.basename(song.filePath));
             if (fs.existsSync(localFilePath)) fs.unlinkSync(localFilePath);
-            await musicCollection.deleteOne({ _id: new ObjectId(id) });
+            await songsCollection.deleteOne({ _id: new ObjectId(id) });
         }
 
         res.status(200).json({ message: "✅ Song deleted successfully!" });
@@ -175,6 +147,12 @@ app.delete("/songs/:id", async (req, res) => {
 // ✅ Root Route
 app.get("/", (req, res) => {
     res.send("🎵 Server is running. Use the API to upload and access music.");
+});
+
+// ✅ Start Server
+app.listen(PORT, async () => {
+    await connectToMongoDB();
+    console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
 
 // ✅ Debugging: List All Routes
