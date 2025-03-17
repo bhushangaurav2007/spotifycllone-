@@ -52,12 +52,16 @@ const localStorage = multer.diskStorage({
 const localUpload = multer({ storage: localStorage });
 
 // ✅ Cloudinary Setup (For Render)
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || dooivhkfn, 
-    api_key: process.env.CLOUDINARY_API_KEY || 875399719474793,
-    api_secret: process.env.CLOUDINARY_API_SECRET || "dM1huVk7JN8qftRveF-3b02hLMM",
-});
+if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+    console.error("❌ Cloudinary environment variables are missing! Check your Render settings.");
+    process.exit(1); // Stop the server if Cloudinary is not configured
+}
 
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,  // No fallback values!
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 
 const cloudinaryStorage = new CloudinaryStorage({
