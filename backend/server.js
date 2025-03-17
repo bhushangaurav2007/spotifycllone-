@@ -18,6 +18,13 @@ const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
 const STORAGE_TYPE = process.env.STORAGE_TYPE || "local"; // "local" or "cloudinary"
 
+// ✅ Debug: Check if environment variables are loading correctly
+console.log("🔍 Checking Environment Variables:");
+console.log("MONGO_URI:", MONGO_URI ? "✅ Loaded" : "❌ Missing");
+console.log("Cloud Name:", process.env.CLOUDINARY_CLOUD_NAME);
+console.log("API Key:", process.env.CLOUDINARY_API_KEY ? "✅ Loaded" : "❌ Missing");
+console.log("API Secret:", process.env.CLOUDINARY_API_SECRET ? "✅ Loaded" : "❌ Missing");
+
 // ✅ Connect to MongoDB
 let db, musicCollection, songsCollection;
 async function connectToMongoDB() {
@@ -78,7 +85,7 @@ app.post("/upload-songs", (req, res) => {
             // ✅ Fix Cloudinary URL Issue
             const uploadedSongs = req.files.map((file) => ({
                 title: file.originalname.replace(".mp3", ""),
-                filePath: STORAGE_TYPE === "cloudinary" ? file.path : `/songs/${file.filename}`, // ✅ Cloudinary returns file.path as URL
+                filePath: STORAGE_TYPE === "cloudinary" ? file.path || file.secure_url : `/songs/${file.filename}`, // ✅ Cloudinary returns file.secure_url
                 storageType: STORAGE_TYPE,
                 createdAt: new Date(),
             }));
@@ -93,7 +100,6 @@ app.post("/upload-songs", (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
-
 
 // ✅ Serve Songs (For localhost only)
 if (STORAGE_TYPE === "local") {
@@ -141,7 +147,10 @@ app.delete("/songs/:id", async (req, res) => {
         if (!song) return res.status(404).json({ error: "❌ Song not found!" });
 
         if (song.storageType === "cloudinary") {
-            const publicId = song.filePath.split("/").pop().split(".")[0];
+            const urlParts = song.filePath.split("/");
+            const fileName = urlParts.pop();
+            const publicId = fileName.split(".")[0];
+
             await cloudinary.uploader.destroy(`music/${publicId}`);
             await songsCollection.deleteOne({ _id: new ObjectId(id) });
         } else {
@@ -168,11 +177,13 @@ app.use((req, res, next) => {
     next();
 });
 
+
 app._router.stack.forEach(route => {
     if (route.route && route.route.path) {
         console.log(`📌 Registered Route: ${route.route.path}`);
     }
 });
+
 
 // ✅ Start Server
 app.listen(PORT, async () => {
