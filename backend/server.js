@@ -17,7 +17,7 @@ app.use(express.json());
 // ✅ Environment Variables
 const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
-const STORAGE_TYPE = process.env.STORAGE_TYPE || "local"; // "local" or "cloudinary"
+const STORAGE_TYPE = process.env.STORAGE_TYPE || "cloudinary"; // "local" or "cloudinary"
 
 console.log("🔍 Checking Environment Variables:");
 console.log("MONGO_URI:", MONGO_URI ? "✅ Loaded" : "❌ Missing");
@@ -41,7 +41,7 @@ async function connectToMongoDB() {
 }
 
 // ✅ Local Storage Setup
-const SONGS_FOLDER = "./songsFolder";
+const SONGS_FOLDER = "./songs";
 if (!fs.existsSync(SONGS_FOLDER)) fs.mkdirSync(SONGS_FOLDER, { recursive: true });
 
 const localStorage = multer.diskStorage({
