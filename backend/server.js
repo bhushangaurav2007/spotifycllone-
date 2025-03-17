@@ -14,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// ✅ Environment Variables
 const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
 const STORAGE_TYPE = process.env.STORAGE_TYPE || "local"; // "local" or "cloudinary"
@@ -52,7 +53,7 @@ const localUpload = multer({ storage: localStorage });
 
 // ✅ Cloudinary Setup
 if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-    console.error("❌ Cloudinary environment variables are missing! Check your Render settings.");
+    console.error("❌ Cloudinary environment variables are missing! Check your settings.");
     process.exit(1);
 }
 
@@ -72,7 +73,7 @@ const cloudinaryStorage = new CloudinaryStorage({
 });
 const cloudUpload = multer({ storage: cloudinaryStorage });
 
-// ✅ Corrected Upload Route
+// ✅ File Upload Route
 app.post("/upload-songs", (req, res) => {
     const upload = STORAGE_TYPE === "cloudinary" ? cloudUpload.array("files", 10) : localUpload.array("files", 10);
 
@@ -149,28 +150,22 @@ app.get("/", (req, res) => {
     res.send("🎵 Server is running. Use the API to upload and access music.");
 });
 
-// ✅ Start Server
-app.listen(PORT, async () => {
-    await connectToMongoDB();
-    console.log(`🚀 Server running at http://localhost:${PORT}`);
-});
-
-// ✅ Debugging: List All Routes
+// ✅ Debugging Middleware: Logs all incoming requests
 app.use((req, res, next) => {
     console.log(`🔍 Received ${req.method} request on ${req.url}`);
     next();
 });
 
+// ✅ Start Server Once (Avoids `EADDRINUSE`)
+connectToMongoDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running at http://localhost:${PORT}`);
+    });
 
-app._router.stack.forEach(route => {
-    if (route.route && route.route.path) {
-        console.log(`📌 Registered Route: ${route.route.path}`);
-    }
-});
-
-
-// ✅ Start Server
-app.listen(PORT, async () => {
-    await connectToMongoDB();
-    console.log(`🚀 Server running at http://localhost:${PORT}`);
+    // ✅ Debugging: List All Routes
+    app._router.stack.forEach(route => {
+        if (route.route && route.route.path) {
+            console.log(`📌 Registered Route: ${route.route.path}`);
+        }
+    });
 });
