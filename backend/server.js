@@ -7,6 +7,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import fs from "fs";
 import path from "path";
+import Sitemap from "express-sitemap";
 
 dotenv.config();
 
@@ -21,17 +22,14 @@ const STORAGE_TYPE = process.env.STORAGE_TYPE || "cloudinary"; // "local" or "cl
 
 console.log("🔍 Checking Environment Variables:");
 console.log("MONGO_URI:", MONGO_URI ? "✅ Loaded" : "❌ Missing");
-console.log("Cloud Name:", process.env.CLOUDINARY_CLOUD_NAME);
-console.log("API Key:", process.env.CLOUDINARY_API_KEY ? "✅ Loaded" : "❌ Missing");
-console.log("API Secret:", process.env.CLOUDINARY_API_SECRET ? "✅ Loaded" : "❌ Missing");
+console.log("Cloudinary API Key:", process.env.CLOUDINARY_API_KEY ? "✅ Loaded" : "❌ Missing");
 
-let db, musicCollection, songsCollection;
+let db, songsCollection;
 async function connectToMongoDB() {
     try {
         const client = new MongoClient(MONGO_URI);
         await client.connect();
         db = client.db("musicDB");
-        musicCollection = db.collection("music");
         songsCollection = db.collection("songs");
         console.log("✅ Connected to MongoDB!");
     } catch (err) {
@@ -40,29 +38,14 @@ async function connectToMongoDB() {
     }
 }
 
-// ✅ Local Storage Setup
-const SONGS_FOLDER = "./songs";
-if (!fs.existsSync(SONGS_FOLDER)) fs.mkdirSync(SONGS_FOLDER, { recursive: true });
-
-const localStorage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, SONGS_FOLDER),
-    filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
-});
-
-const localUpload = multer({ storage: localStorage });
-
 // ✅ Cloudinary Setup
-if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
-    console.error("❌ Cloudinary environment variables are missing! Check your settings.");
-    process.exit(1);
-}
-
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// ✅ File Upload Setup
 const cloudinaryStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
@@ -73,38 +56,21 @@ const cloudinaryStorage = new CloudinaryStorage({
 });
 const cloudUpload = multer({ storage: cloudinaryStorage });
 
-// ✅ File Upload Route
-app.post("/upload-songs", (req, res) => {
-    const upload = STORAGE_TYPE === "cloudinary" ? cloudUpload.array("files", 10) : localUpload.array("files", 10);
+app.post("/upload-songs", cloudUpload.array("files", 10), async (req, res) => {
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).json({ error: "❌ No files uploaded!" });
+    }
 
-    upload(req, res, async (err) => {
-        if (err) {
-            console.error("❌ Upload Error:", err);
-            return res.status(400).json({ error: `Upload failed: ${err.message}` });
-        }
+    const uploadedSongs = req.files.map((file) => ({
+        title: file.originalname.replace(".mp3", ""),
+        filePath: file.path || file.secure_url,
+        storageType: "cloudinary",
+        createdAt: new Date(),
+    }));
 
-        if (!req.files || req.files.length === 0) {
-            return res.status(400).json({ error: "❌ No files uploaded!" });
-        }
-
-        const uploadedSongs = req.files.map((file) => ({
-            title: file.originalname.replace(".mp3", ""),
-            filePath: STORAGE_TYPE === "cloudinary" ? file.path || file.secure_url : `/songs/${file.filename}`,
-            storageType: STORAGE_TYPE,
-            createdAt: new Date(),
-        }));
-
-        await songsCollection.insertMany(uploadedSongs);
-
-        console.log("✅ Songs Uploaded:", uploadedSongs);
-        res.status(201).json({ message: "✅ Songs uploaded successfully!", songs: uploadedSongs });
-    });
+    await songsCollection.insertMany(uploadedSongs);
+    res.status(201).json({ message: "✅ Songs uploaded successfully!", songs: uploadedSongs });
 });
-
-// ✅ Serving Songs for Localhost
-if (STORAGE_TYPE === "local") {
-    app.use("/songs", express.static(SONGS_FOLDER));
-}
 
 // ✅ Fetching Songs
 app.get("/musics", async (req, res) => {
@@ -131,13 +97,9 @@ app.delete("/songs/:id", async (req, res) => {
             const publicId = fileName.split(".")[0];
 
             await cloudinary.uploader.destroy(`music/${publicId}`);
-            await songsCollection.deleteOne({ _id: new ObjectId(id) });
-        } else {
-            const localFilePath = path.join(SONGS_FOLDER, path.basename(song.filePath));
-            if (fs.existsSync(localFilePath)) fs.unlinkSync(localFilePath);
-            await songsCollection.deleteOne({ _id: new ObjectId(id) });
         }
 
+        await songsCollection.deleteOne({ _id: new ObjectId(id) });
         res.status(200).json({ message: "✅ Song deleted successfully!" });
     } catch (error) {
         console.error("❌ Error deleting song:", error);
@@ -145,10 +107,38 @@ app.delete("/songs/:id", async (req, res) => {
     }
 });
 
+// ✅ Serve a Sitemap for Google Search
+const sitemap = Sitemap({
+    url: "https://spotifycllone.onrender.com",
+    map: {
+        "/": ["get"],
+        "/musics": ["get"],
+        "/upload-songs": ["post"]
+    },
+    route: {
+        "/": { lastmod: "2024-03-17", changefreq: "weekly", priority: 1.0 },
+        "/musics": { lastmod: "2024-03-17", changefreq: "daily", priority: 0.8 },
+        "/upload-songs": { lastmod: "2024-03-17", changefreq: "weekly", priority: 0.7 }
+    }
+});
+
+// Serve sitemap.xml
+app.get("/sitemap.xml", (req, res) => {
+    sitemap.XMLtoWeb(res);
+});
+
 // ✅ Root Route
 app.get("/", (req, res) => {
     res.send("🎵 Server is running. Use the API to upload and access music.");
 });
+
+// ✅ Start Server
+connectToMongoDB().then(() => {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server running at http://localhost:${PORT}`);
+    });
+});
+
 
 // ✅ Debugging Middleware: Logs all incoming requests
 app.use((req, res, next) => {
@@ -156,11 +146,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// ✅ Start Server Once (Avoids `EADDRINUSE`)
-connectToMongoDB().then(() => {
-    app.listen(PORT, () => {
-        console.log(`🚀 Server running at http://localhost:${PORT}`);
-    });
+
 
     // ✅ Debugging: List All Routes
     app._router.stack.forEach(route => {
