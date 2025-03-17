@@ -9,7 +9,7 @@ const App = () => {
   const [songs, setSongs] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [error, setError] = useState(null); // ✅ Handles API errors
+  const [error, setError] = useState(null);
   const audioRef = useRef(null);
 
   // ✅ Fetch songs from backend
@@ -45,24 +45,23 @@ const App = () => {
       togglePlayPause(); // Toggle if same song is clicked
     } else {
       setCurrentIndex(index);
+      setIsPlaying(true);
     }
   };
 
   // ✅ Toggle play/pause
   const togglePlayPause = () => {
-    setIsPlaying((prev) => {
-      if (audioRef.current) {
-        if (prev) {
-          audioRef.current.pause();
-        } else {
-          audioRef.current.play().catch((err) => {
-            console.error("❌ Play Error:", err);
-            setIsPlaying(false);
-          });
-        }
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play().catch((err) => {
+          console.error("❌ Play Error:", err);
+          setIsPlaying(false);
+        });
       }
-      return !prev;
-    });
+    }
+    setIsPlaying((prev) => !prev);
   };
 
   // ✅ Play next song
@@ -107,11 +106,14 @@ const App = () => {
             {songs.length > 0 ? (
               songs.map((song, index) => (
                 <div
-                  className={`s1 ${index === currentIndex ? "active" : ""}`} // ✅ Highlights playing song
+                  className={`s1 ${index === currentIndex ? "active playing" : ""}`} // ✅ Highlights playing song
                   key={index}
                   onClick={() => playSong(index)}
                 >
                   <span>🎵 {song.title}</span>
+                  {index === currentIndex && isPlaying && (
+                    <div className="playing-effect"></div>
+                  )}
                 </div>
               ))
             ) : (
