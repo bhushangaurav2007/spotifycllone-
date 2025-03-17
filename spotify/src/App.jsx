@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // ✅ Font Awesome for icons
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000"; // ✅ Dynamic API URL
+const API_URL = process.env.REACT_APP_API_URL || ""; // ✅ Dynamic API URL
 
 const App = () => {
   const [songs, setSongs] = useState([]);
