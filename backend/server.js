@@ -3,7 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { MongoClient, ObjectId } from "mongodb";
 import multer from "multer";
-import cloudinary from "cloudinary";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import fs from "fs";
 import path from "path";
 
@@ -15,15 +16,10 @@ app.use(express.json());
 
 const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
-
-if (!MONGO_URI) {
-    console.error("❌ ERROR: MONGO_URI is missing! Check your .env file.");
-    process.exit(1);
-}
-
-let db, musicCollection;
+const STORAGE_TYPE = process.env.STORAGE_TYPE || "local"; // "local" or "cloudinary"
 
 // ✅ Connect to MongoDB
+let db, musicCollection;
 async function connectToMongoDB() {
     try {
         const client = new MongoClient(MONGO_URI);
@@ -37,80 +33,99 @@ async function connectToMongoDB() {
     }
 }
 
-// ✅ Configure Cloudinary
-cloudinary.v2.config({
-    cloud_name: process.env.CLOUD_NAME,
-    api_key: process.env.CLOUD_API_KEY,
-    api_secret: process.env.CLOUD_API_SECRET,
-});
+// ✅ Local Storage Setup (For localhost)
+const SONGS_FOLDER = "./songsFolder";
+if (!fs.existsSync(SONGS_FOLDER)) fs.mkdirSync(SONGS_FOLDER, { recursive: true });
 
-// ✅ Multer Setup for Temporary File Uploads
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => cb(null, "uploads/"),
+const localStorage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, SONGS_FOLDER),
     filename: (req, file, cb) => cb(null, file.originalname),
 });
-const upload = multer({ storage });
+const localUpload = multer({ storage: localStorage });
 
-// ✅ API: Upload MP3 to Cloudinary
-app.post("/upload-song", upload.single("file"), async (req, res) => {
+// ✅ Cloudinary Setup (For Render)
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+const cloudinaryStorage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: "music",
+        resource_type: "auto",
+        allowed_formats: ["mp3"],
+    },
+});
+const cloudUpload = multer({ storage: cloudinaryStorage });
+
+// ✅ Upload Songs (Local for localhost, Cloudinary for Render)
+app.post("/upload-songs", async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ error: "❌ No file uploaded!" });
-        }
+        const upload = STORAGE_TYPE === "cloudinary" ? cloudUpload.array("files", 10) : localUpload.array("files", 10);
 
-        // ✅ Upload File to Cloudinary
-        const uploadResult = await cloudinary.v2.uploader.upload(req.file.path, {
-            resource_type: "video",
-            folder: "songs",
+        upload(req, res, async (err) => {
+            if (err) return res.status(500).json({ error: "❌ File upload failed!" });
+
+            if (!req.files || req.files.length === 0) {
+                return res.status(400).json({ error: "❌ No files uploaded!" });
+            }
+
+            const uploadedSongs = req.files.map((file) => ({
+                title: file.originalname.replace(".mp3", ""),
+                filePath: STORAGE_TYPE === "cloudinary" ? file.path : `/songs/${file.filename}`,
+                storageType: STORAGE_TYPE,
+                createdAt: new Date(),
+            }));
+
+            await musicCollection.insertMany(uploadedSongs);
+            res.status(201).json({ message: "✅ Songs uploaded successfully!", songs: uploadedSongs });
         });
-
-        // ✅ Save URL to MongoDB
-        const song = {
-            title: req.file.originalname.replace(".mp3", ""),
-            fileUrl: uploadResult.secure_url,
-            createdAt: new Date(),
-        };
-
-        await musicCollection.insertOne(song);
-
-        // ✅ Delete Local File After Upload
-        fs.unlinkSync(req.file.path);
-
-        return res.status(201).json({ message: "✅ File uploaded successfully!", song });
     } catch (error) {
-        console.error("❌ Error uploading file:", error);
+        console.error("❌ Error uploading songs:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
-// ✅ API: Get All Songs
+// ✅ Serve Songs (For localhost only)
+if (STORAGE_TYPE === "local") {
+    app.use("/songs", express.static(SONGS_FOLDER));
+}
+
+// ✅ Get All Songs
 app.get("/music", async (req, res) => {
     try {
         const songs = await musicCollection.find().toArray();
-        res.status(200).json(songs);
+        const formattedSongs = songs.map(song => ({
+            _id: song._id,
+            title: song.title,
+            url: song.storageType === "cloudinary" ? song.filePath : `http://localhost:${PORT}${song.filePath}`,
+        }));
+        res.status(200).json(formattedSongs);
     } catch (error) {
         console.error("❌ Error fetching music:", error);
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
 
-// ✅ API: Delete a Song
+// ✅ Delete a Song
 app.delete("/songs/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const song = await musicCollection.findOne({ _id: new ObjectId(id) });
 
-        if (!song) {
-            return res.status(404).json({ error: "❌ Song not found!" });
+        if (!song) return res.status(404).json({ error: "❌ Song not found!" });
+
+        if (song.storageType === "cloudinary") {
+            const publicId = song.filePath.split("/").pop().split(".")[0];
+            await cloudinary.uploader.destroy(`music/${publicId}`);
+        } else {
+            const localFilePath = path.join(SONGS_FOLDER, path.basename(song.filePath));
+            if (fs.existsSync(localFilePath)) fs.unlinkSync(localFilePath);
         }
 
-        // ✅ Delete from Cloudinary
-        const publicId = song.fileUrl.split("/").pop().split(".")[0]; // Extract public_id from URL
-        await cloudinary.v2.uploader.destroy(`songs/${publicId}`, { resource_type: "video" });
-
-        // ✅ Delete from MongoDB
         await musicCollection.deleteOne({ _id: new ObjectId(id) });
-
         res.status(200).json({ message: "✅ Song deleted successfully!" });
     } catch (error) {
         console.error("❌ Error deleting song:", error);
