@@ -61,7 +61,6 @@ const cloudinaryStorage = new CloudinaryStorage({
 });
 const cloudUpload = multer({ storage: cloudinaryStorage });
 
-// ✅ Upload Songs (Local for localhost, Cloudinary for Render)
 app.post("/upload-songs", (req, res) => {
     try {
         const upload = STORAGE_TYPE === "cloudinary" ? cloudUpload.array("files", 10) : localUpload.array("files", 10);
@@ -76,18 +75,15 @@ app.post("/upload-songs", (req, res) => {
                 return res.status(400).json({ error: "❌ No files uploaded!" });
             }
 
+            // ✅ Fix Cloudinary URL Issue
             const uploadedSongs = req.files.map((file) => ({
                 title: file.originalname.replace(".mp3", ""),
-                filePath: STORAGE_TYPE === "cloudinary" ? file.path : `/songs/${file.filename}`,
+                filePath: STORAGE_TYPE === "cloudinary" ? file.path : `/songs/${file.filename}`, // ✅ Cloudinary returns file.path as URL
                 storageType: STORAGE_TYPE,
                 createdAt: new Date(),
             }));
 
-            if (STORAGE_TYPE === "cloudinary") {
-                await songsCollection.insertMany(uploadedSongs);
-            } else {
-                await musicCollection.insertMany(uploadedSongs);
-            }
+            await songsCollection.insertMany(uploadedSongs);
 
             console.log("✅ Songs Uploaded:", uploadedSongs);
             res.status(201).json({ message: "✅ Songs uploaded successfully!", songs: uploadedSongs });
@@ -97,6 +93,7 @@ app.post("/upload-songs", (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 });
+
 
 // ✅ Serve Songs (For localhost only)
 if (STORAGE_TYPE === "local") {
