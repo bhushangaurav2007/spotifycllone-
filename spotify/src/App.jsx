@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // ✅ Font Awesome for icons
 
-const API_URL = process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com"; // ✅ Dynamic API URL
+const API_URL =
+  process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com"; // ✅ Dynamic API URL
 
 const App = () => {
   const [songs, setSongs] = useState([]);
@@ -18,18 +19,25 @@ const App = () => {
         if (!res.ok) throw new Error("Failed to fetch songs");
         return res.json();
       })
-      .then((data) => setSongs(data))
+      .then((data) => {
+        const validSongs = data.filter((song) => song.filePath); // ✅ Ensures valid file paths
+        setSongs(validSongs);
+        setError(null);
+      })
       .catch((err) => setError(err.message));
   }, []);
 
   // ✅ Play song when currentIndex changes
   useEffect(() => {
-    if (audioRef.current && currentIndex !== null) {
-      audioRef.current.src = songs[currentIndex]?.url;
-      audioRef.current.play();
+    if (audioRef.current && currentIndex !== null && songs[currentIndex]) {
+      audioRef.current.src = songs[currentIndex].filePath;
+      audioRef.current.play().catch((err) => {
+        console.error("❌ Audio Playback Error:", err);
+        setIsPlaying(false);
+      });
       setIsPlaying(true);
     }
-  }, [currentIndex]);
+  }, [currentIndex, songs]);
 
   // ✅ Play selected song
   const playSong = (index) => {
@@ -44,7 +52,14 @@ const App = () => {
   const togglePlayPause = () => {
     setIsPlaying((prev) => {
       if (audioRef.current) {
-        prev ? audioRef.current.pause() : audioRef.current.play();
+        if (prev) {
+          audioRef.current.pause();
+        } else {
+          audioRef.current.play().catch((err) => {
+            console.error("❌ Play Error:", err);
+            setIsPlaying(false);
+          });
+        }
       }
       return !prev;
     });
@@ -72,7 +87,7 @@ const App = () => {
           <li className="brand">
             <img
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSd-eHyIHkbiQ428WtDUb7s6dFnDK3CQ7YQog&s"
-              alt="spotify"
+              alt="Spotify"
             />
             Spotify Clone
           </li>
@@ -108,30 +123,33 @@ const App = () => {
 
       {/* 🔹 Music Player */}
       <div className="bottom">
-        {currentIndex !== null && (
-          <audio
-            ref={audioRef}
-            src={songs[currentIndex].url}
-            controls
-            autoPlay
-            onEnded={playNext} // ✅ Auto-play next song when current ends
-          ></audio>
+        {currentIndex !== null && songs[currentIndex] && (
+          <>
+            <audio
+              ref={audioRef}
+              src={songs[currentIndex].filePath}
+              controls
+              autoPlay
+              onEnded={playNext} // ✅ Auto-play next song when current ends
+            ></audio>
+
+            <div className="icons">
+              <i className="fa-solid fa-3x fa-backward-step" onClick={playPrev}></i>
+              <i
+                className={`fa-regular fa-3x ${
+                  isPlaying ? "fa-circle-pause" : "fa-circle-play"
+                }`}
+                onClick={togglePlayPause}
+              ></i>
+              <i className="fa-solid fa-3x fa-forward-step" onClick={playNext}></i>
+            </div>
+            <div className="songInfo">
+              {currentIndex !== null
+                ? `Playing: ${songs[currentIndex].title}`
+                : "Select a Song"}
+            </div>
+          </>
         )}
-        <div className="icons">
-          <i className="fa-solid fa-3x fa-backward-step" onClick={playPrev}></i>
-          <i
-            className={`fa-regular fa-3x ${
-              isPlaying ? "fa-circle-pause" : "fa-circle-play"
-            }`}
-            onClick={togglePlayPause}
-          ></i>
-          <i className="fa-solid fa-3x fa-forward-step" onClick={playNext}></i>
-        </div>
-        <div className="songInfo">
-          {currentIndex !== null
-            ? `Playing: ${songs[currentIndex].title}`
-            : "Select a Song"}
-        </div>
       </div>
     </div>
   );
