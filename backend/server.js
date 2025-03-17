@@ -15,14 +15,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// ✅ Environment Variables
 const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
-const STORAGE_TYPE = process.env.STORAGE_TYPE || "cloudinary"; // "local" or "cloudinary"
-
-console.log("🔍 Checking Environment Variables:");
-console.log("MONGO_URI:", MONGO_URI ? "✅ Loaded" : "❌ Missing");
-console.log("Cloudinary API Key:", process.env.CLOUDINARY_API_KEY ? "✅ Loaded" : "❌ Missing");
 
 let db, songsCollection;
 async function connectToMongoDB() {
@@ -38,14 +32,12 @@ async function connectToMongoDB() {
     }
 }
 
-// ✅ Cloudinary Setup
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// ✅ File Upload Setup
 const cloudinaryStorage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
@@ -72,7 +64,6 @@ app.post("/upload-songs", cloudUpload.array("files", 10), async (req, res) => {
     res.status(201).json({ message: "✅ Songs uploaded successfully!", songs: uploadedSongs });
 });
 
-// ✅ Fetching Songs
 app.get("/musics", async (req, res) => {
     try {
         const songs = await songsCollection.find().toArray();
@@ -83,7 +74,6 @@ app.get("/musics", async (req, res) => {
     }
 });
 
-// ✅ Delete a Song
 app.delete("/songs/:id", async (req, res) => {
     try {
         const { id } = req.params;
@@ -107,7 +97,7 @@ app.delete("/songs/:id", async (req, res) => {
     }
 });
 
-// ✅ Serve a Sitemap for Google Search
+// ✅ Sitemap for Google Search
 const sitemap = Sitemap({
     url: "https://spotifycllone.onrender.com",
     map: {
@@ -122,12 +112,10 @@ const sitemap = Sitemap({
     }
 });
 
-// Serve sitemap.xml
 app.get("/sitemap.xml", (req, res) => {
     sitemap.XMLtoWeb(res);
 });
 
-// ✅ Root Route
 app.get("/", (req, res) => {
     res.send("🎵 Server is running. Use the API to upload and access music.");
 });
@@ -138,6 +126,7 @@ connectToMongoDB().then(() => {
         console.log(`🚀 Server running at http://localhost:${PORT}`);
     });
 });
+
 
 
 // ✅ Debugging Middleware: Logs all incoming requests
@@ -154,4 +143,4 @@ app.use((req, res, next) => {
             console.log(`📌 Registered Route: ${route.route.path}`);
         }
     });
-});
+
