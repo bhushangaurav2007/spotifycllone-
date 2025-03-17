@@ -1,50 +1,59 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
+import "@fortawesome/fontawesome-free/css/all.min.css"; // ✅ Font Awesome for icons
 
-const API_URL = "https://spotifycllone.onrender.com" || "https://locallhost:3000/"; // Change this if your backend runs on a different port
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:3000"; // ✅ Dynamic API URL
 
 const App = () => {
   const [songs, setSongs] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [error, setError] = useState(null); // ✅ Handles API errors
   const audioRef = useRef(null);
 
   // ✅ Fetch songs from backend
   useEffect(() => {
     fetch(`${API_URL}/musics`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch songs");
+        return res.json();
+      })
       .then((data) => setSongs(data))
-      .catch((err) => console.error("Error fetching songs:", err));
+      .catch((err) => setError(err.message));
   }, []);
+
+  // ✅ Play song when currentIndex changes
+  useEffect(() => {
+    if (audioRef.current && currentIndex !== null) {
+      audioRef.current.src = songs[currentIndex]?.url;
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  }, [currentIndex]);
 
   // ✅ Play selected song
   const playSong = (index) => {
     if (index === currentIndex) {
-      togglePlayPause(); // Toggle if clicking the same song
-      return;
+      togglePlayPause(); // Toggle if same song is clicked
+    } else {
+      setCurrentIndex(index);
     }
-
-    setCurrentIndex(index);
-    setIsPlaying(true);
   };
 
   // ✅ Toggle play/pause
   const togglePlayPause = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
+    setIsPlaying((prev) => {
+      if (audioRef.current) {
+        prev ? audioRef.current.pause() : audioRef.current.play();
       }
-      setIsPlaying(!isPlaying);
-    }
+      return !prev;
+    });
   };
 
   // ✅ Play next song
   const playNext = () => {
     if (currentIndex !== null && currentIndex < songs.length - 1) {
       setCurrentIndex(currentIndex + 1);
-      setIsPlaying(true);
     }
   };
 
@@ -52,7 +61,6 @@ const App = () => {
   const playPrev = () => {
     if (currentIndex !== null && currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
-      setIsPlaying(true);
     }
   };
 
@@ -73,6 +81,9 @@ const App = () => {
         </ul>
       </nav>
 
+      {/* 🔹 Error Message */}
+      {error && <p className="error">❌ {error}</p>}
+
       {/* 🔹 Song List */}
       <div className="page">
         <div className="hero">
@@ -80,7 +91,11 @@ const App = () => {
           <div className="songList">
             {songs.length > 0 ? (
               songs.map((song, index) => (
-                <div className="s1" key={index} onClick={() => playSong(index)}>
+                <div
+                  className={`s1 ${index === currentIndex ? "active" : ""}`} // ✅ Highlights playing song
+                  key={index}
+                  onClick={() => playSong(index)}
+                >
                   <span>🎵 {song.title}</span>
                 </div>
               ))
@@ -99,7 +114,7 @@ const App = () => {
             src={songs[currentIndex].url}
             controls
             autoPlay
-            onEnded={playNext} // Automatically play next song when current ends
+            onEnded={playNext} // ✅ Auto-play next song when current ends
           ></audio>
         )}
         <div className="icons">
