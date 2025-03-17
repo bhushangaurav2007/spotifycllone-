@@ -53,9 +53,9 @@ const localUpload = multer({ storage: localStorage });
 
 // ✅ Cloudinary Setup (For Render)
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "",  // Loaded from Render .env
-    api_key: process.env.CLOUDINARY_API_KEY || "",       // Loaded from Render .env
-    api_secret: process.env.CLOUDINARY_API_SECRET || "", // Loaded from Render .env
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || "dooivhkfn",  // Loaded from Render .env
+    api_key: process.env.CLOUDINARY_API_KEY || "875399719474793",       // Loaded from Render .env
+    api_secret: process.env.CLOUDINARY_API_SECRET || "dM1huVk7JN8qftRveF-3b02hLMM", // Loaded from Render .env
 });
 
 
