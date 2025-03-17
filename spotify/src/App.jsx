@@ -11,7 +11,7 @@ const App = () => {
 
   // ✅ Fetch songs from backend
   useEffect(() => {
-    fetch(`${API_URL}/music`)
+    fetch(`${API_URL}/musics`)
       .then((res) => res.json())
       .then((data) => setSongs(data))
       .catch((err) => console.error("Error fetching songs:", err));
