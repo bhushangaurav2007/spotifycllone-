@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
-import "./index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // ✅ Font Awesome for icons
 
-const API_URL = process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com"; // ✅ Dynamic API URL
+const API_URL = process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com";
 
 const App = () => {
   const [songs, setSongs] = useState([]);
@@ -11,7 +10,6 @@ const App = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState(null);
   const audioRef = useRef(null);
-  const songListRef = useRef(null);
 
   // ✅ Fetch songs from backend
   useEffect(() => {
@@ -32,17 +30,14 @@ const App = () => {
   useEffect(() => {
     if (audioRef.current && currentIndex !== null && songs[currentIndex]) {
       audioRef.current.src = songs[currentIndex].filePath;
-      audioRef.current
-        .play()
-        .catch((err) => {
-          console.error("❌ Audio Playback Error:", err);
-          setIsPlaying(false);
-        });
+      audioRef.current.play().catch((err) => {
+        console.error("❌ Audio Playback Error:", err);
+        setIsPlaying(false);
+      });
       setIsPlaying(true);
     }
   }, [currentIndex, songs]);
 
-  // ✅ Play selected song
   const playSong = (index) => {
     if (index === currentIndex) {
       togglePlayPause();
@@ -52,47 +47,29 @@ const App = () => {
     }
   };
 
-  // ✅ Toggle play/pause
   const togglePlayPause = () => {
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current
-          .play()
-          .catch((err) => {
-            console.error("❌ Play Error:", err);
-            setIsPlaying(false);
-          });
+        audioRef.current.play().catch((err) => {
+          console.error("❌ Play Error:", err);
+          setIsPlaying(false);
+        });
       }
     }
     setIsPlaying((prev) => !prev);
   };
 
-  // ✅ Play next song
   const playNext = () => {
     if (currentIndex !== null && currentIndex < songs.length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
   };
 
-  // ✅ Play previous song
   const playPrev = () => {
     if (currentIndex !== null && currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
-    }
-  };
-
-  // ✅ Scroll Functions
-  const scrollLeft = () => {
-    if (songListRef.current) {
-      songListRef.current.scrollBy({ left: -200, behavior: "smooth" });
-    }
-  };
-
-  const scrollRight = () => {
-    if (songListRef.current) {
-      songListRef.current.scrollBy({ left: 200, behavior: "smooth" });
     }
   };
 
@@ -117,32 +94,27 @@ const App = () => {
       <div className="page">
         <div className="hero">
           <h1>Best of NCS - No Copyright Sounds</h1>
-          <div className="scroll-container">
-            <button className="scroll-btn" onClick={scrollLeft}>
-              &larr;
-            </button>
-            <div className="songList" ref={songListRef}>
-              {songs.length > 0 ? (
-                songs.map((song, index) => (
+
+          {/* ✅ Divide songs into rows of 10 */}
+          {Array.from({ length: Math.ceil(songs.length / 10) }, (_, rowIndex) => (
+            <div className="song-row" key={rowIndex}>
+              {songs.slice(rowIndex * 10, rowIndex * 10 + 10).map((song, index) => {
+                const globalIndex = rowIndex * 10 + index;
+                return (
                   <div
-                    className={`s1 ${index === currentIndex ? "active playing" : ""}`}
-                    key={index}
-                    onClick={() => playSong(index)}
+                    className={`s1 ${globalIndex === currentIndex ? "active playing" : ""}`}
+                    key={globalIndex}
+                    onClick={() => playSong(globalIndex)}
                   >
                     <span>🎵 {song.title}</span>
-                    {index === currentIndex && isPlaying && (
+                    {globalIndex === currentIndex && isPlaying && (
                       <div className="playing-effect"></div>
                     )}
                   </div>
-                ))
-              ) : (
-                <p>Loading songs...</p>
-              )}
+                );
+              })}
             </div>
-            <button className="scroll-btn" onClick={scrollRight}>
-              &rarr;
-            </button>
-          </div>
+          ))}
         </div>
       </div>
 
