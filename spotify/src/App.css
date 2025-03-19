@@ -6,58 +6,69 @@
   text-align: center;
 }
 
-
-/* ✅ Music Player UI - Bottom Controls */
-.bottom-controls {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 100px;
-  background-color: black;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-}
-
-/* ✅ Buttons for Player Controls */
-button {
-  background-color: #000;
-  border: none;
-  color: rgb(255, 0, 0);
-  padding: 8px 15px;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 5px;
-  transition: 0.3s;
-}
-
-button:hover {
-  background-color: rgba(255, 0, 0, 0.2);
-}
-
-/* ✅ Song List */
+/* ✅ Song List - Each row is now scrollable */
 .songList {
   display: flex;
   flex-direction: row;
   align-items: center;
+  overflow-x: auto; /* ✅ Enable horizontal scrolling */
+  white-space: nowrap;
   gap: 10px;
-  margin-top: 20px;
+  padding: 10px;
+  width: 90%;
+  scroll-behavior: smooth;
+}
+
+/* ✅ Scroll Buttons for Each Row */
+.scroll-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.scroll-btn {
+  background: #1db954;
+  color: white;
+  font-size: 20px;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.scroll-btn:hover {
+  background: #1ed760;
+}
+
+/* ✅ Song Groups - Each row contains a maximum of 5 songs */
+.song-group {
+  display: flex;
+  flex-wrap: nowrap; /* ✅ Prevents wrapping */
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  overflow-x: auto; /* ✅ Enable scrolling */
 }
 
 /* ✅ Individual Song Box */
 .s1 {
-  background: #282828;
-  width: 80%;
-  padding: 12px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease-in-out;
+  flex: 0 0 calc(20% - 10px); /* ✅ Ensures 5 songs per row */
+  max-width: 200px;
   text-align: center;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 12px;
+  border-radius: 10px;
+  transition: 0.3s;
+  cursor: pointer;
 }
 
 .s1:hover {
-  background: #444;
+  background: rgba(255, 255, 255, 0.2);
   transform: scale(1.05);
 }
 
@@ -145,68 +156,6 @@ body {
   background-repeat: no-repeat;
 }
 
-/* ✅ Song Container */
-.hero {
-  width: 100%;
-  text-align: center;
-}
-
-/* ✅ Song Group */
-.song-group {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;  /* Ensure items are in a row */
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 5px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  max-width:90%;
-  max-height:50;
-  height:100%;
-}
-
-/* ✅ Individual Song Box */
-.s1 {
-  flex: 1 1 calc(20% - 20px);
-  max-width: 200px;
-  text-align: center;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 12px;
-  border-radius: 10px;
-  transition: 0.3s;
-  cursor: pointer;
-}
-
-.s1:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-/* ✅ Scroll Buttons */
-.scroll-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.scroll-btn {
-  background: #1db954;
-  color: white;
-  font-size: 20px;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 50%;
-  transition: 0.3s;
-}
-
-.scroll-btn:hover {
-  background: #1ed760;
-}
-
 /* ✅ Bottom Player */
 .bottom {
   position: fixed;
@@ -257,19 +206,19 @@ body {
 /* ✅ Responsive Design */
 @media (max-width: 1024px) {
   .s1 {
-    flex: 1 1 calc(33.33% - 20px);
+    flex: 0 0 calc(33.33% - 10px); /* ✅ 3 songs per row on medium screens */
   }
 }
 
 @media (max-width: 768px) {
   .s1 {
-    flex: 1 1 calc(50% - 20px);
+    flex: 0 0 calc(50% - 10px); /* ✅ 2 songs per row on tablets */
   }
 }
 
 @media (max-width: 480px) {
   .s1 {
-    flex: 1 1 100%;
+    flex: 0 0 100%; /* ✅ 1 song per row on mobile */
   }
 
   .bottom {
