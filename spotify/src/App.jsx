@@ -20,7 +20,7 @@ const App = () => {
         return res.json();
       })
       .then((data) => {
-        const validSongs = data.filter((song) => song.filePath); // ✅ Ensures valid file paths
+        const validSongs = data.filter((song) => song.filePath);
         setSongs(validSongs);
         setError(null);
       })
@@ -31,10 +31,12 @@ const App = () => {
   useEffect(() => {
     if (audioRef.current && currentIndex !== null && songs[currentIndex]) {
       audioRef.current.src = songs[currentIndex].filePath;
-      audioRef.current.play().catch((err) => {
-        console.error("❌ Audio Playback Error:", err);
-        setIsPlaying(false);
-      });
+      audioRef.current
+        .play()
+        .catch((err) => {
+          console.error("❌ Audio Playback Error:", err);
+          setIsPlaying(false);
+        });
       setIsPlaying(true);
     }
   }, [currentIndex, songs]);
@@ -42,7 +44,7 @@ const App = () => {
   // ✅ Play selected song
   const playSong = (index) => {
     if (index === currentIndex) {
-      togglePlayPause(); // Toggle if same song is clicked
+      togglePlayPause();
     } else {
       setCurrentIndex(index);
       setIsPlaying(true);
@@ -55,10 +57,12 @@ const App = () => {
       if (isPlaying) {
         audioRef.current.pause();
       } else {
-        audioRef.current.play().catch((err) => {
-          console.error("❌ Play Error:", err);
-          setIsPlaying(false);
-        });
+        audioRef.current
+          .play()
+          .catch((err) => {
+            console.error("❌ Play Error:", err);
+            setIsPlaying(false);
+          });
       }
     }
     setIsPlaying((prev) => !prev);
@@ -125,7 +129,9 @@ const App = () => {
                     onClick={() => playSong(index)}
                   >
                     <span>🎵 {song.title}</span>
-                    {index === currentIndex && isPlaying && <div className="playing-effect"></div>}
+                    {index === currentIndex && isPlaying && (
+                      <div className="playing-effect"></div>
+                    )}
                   </div>
                 ))
               ) : (
@@ -148,7 +154,7 @@ const App = () => {
               src={songs[currentIndex].filePath}
               controls
               autoPlay
-              onEnded={playNext} // ✅ Auto-play next song when current ends
+              onEnded={playNext}
             ></audio>
 
             <div className="icons">
