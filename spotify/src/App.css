@@ -154,7 +154,7 @@ body {
 /* ✅ Song Group */
 .song-group {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
   gap: 15px;
   width: 100%;
