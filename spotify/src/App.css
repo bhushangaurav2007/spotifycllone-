@@ -155,6 +155,7 @@ body {
 .song-group {
   display: flex;
   flex-wrap: wrap;
+  flex-direction: row;  /* Ensure items are in a row */
   justify-content: center;
   gap: 10px;
   width: 100%;
