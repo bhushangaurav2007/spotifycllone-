@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
-import "./index.css"
+import "./index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // ✅ Font Awesome for icons
 
-const API_URL = process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com";
+const API_URL = process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com"; // ✅ Dynamic API URL
 
 const App = () => {
   const [songs, setSongs] = useState([]);
@@ -20,7 +20,7 @@ const App = () => {
         return res.json();
       })
       .then((data) => {
-        const validSongs = data.filter((song) => song.filePath);
+        const validSongs = data.filter((song) => song.filePath); // ✅ Ensures valid file paths
         setSongs(validSongs);
         setError(null);
       })
@@ -39,15 +39,17 @@ const App = () => {
     }
   }, [currentIndex, songs]);
 
+  // ✅ Play selected song
   const playSong = (index) => {
     if (index === currentIndex) {
-      togglePlayPause();
+      togglePlayPause(); // Toggle if same song is clicked
     } else {
       setCurrentIndex(index);
       setIsPlaying(true);
     }
   };
 
+  // ✅ Toggle play/pause
   const togglePlayPause = () => {
     if (audioRef.current) {
       if (isPlaying) {
@@ -62,12 +64,14 @@ const App = () => {
     setIsPlaying((prev) => !prev);
   };
 
+  // ✅ Play next song
   const playNext = () => {
     if (currentIndex !== null && currentIndex < songs.length - 1) {
       setCurrentIndex(currentIndex + 1);
     }
   };
 
+  // ✅ Play previous song
   const playPrev = () => {
     if (currentIndex !== null && currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
@@ -91,31 +95,36 @@ const App = () => {
       {/* 🔹 Error Message */}
       {error && <p className="error">❌ {error}</p>}
 
-      {/* 🔹 Song List */}
+      {/* 🔹 Song List in Rows (5 per row) */}
       <div className="page">
         <div className="hero">
           <h1>Best of NCS - No Copyright Sounds</h1>
-
-          {/* ✅ Divide songs into rows of 10 */}
-          {Array.from({ length: Math.ceil(songs.length / 10) }, (_, rowIndex) => (
-            <div className="song-row" key={rowIndex}>
-              {songs.slice(rowIndex * 10, rowIndex * 10 + 10).map((song, index) => {
-                const globalIndex = rowIndex * 10 + index;
-                return (
-                  <div
-                    className={`s1 ${globalIndex === currentIndex ? "active playing" : ""}`}
-                    key={globalIndex}
-                    onClick={() => playSong(globalIndex)}
-                  >
-                    <span>🎵 {song.title}</span>
-                    {globalIndex === currentIndex && isPlaying && (
-                      <div className="playing-effect"></div>
-                    )}
+          <div className="song-container">
+            {songs.length > 0 ? (
+              songs
+                .reduce((rows, song, index) => {
+                  if (index % 5 === 0) rows.push([]);
+                  rows[rows.length - 1].push(song);
+                  return rows;
+                }, [])
+                .map((row, rowIndex) => (
+                  <div className="song-row" key={rowIndex}>
+                    {row.map((song, index) => (
+                      <div
+                        className={`s1 ${index === currentIndex ? "active playing" : ""}`}
+                        key={index}
+                        onClick={() => playSong(index)}
+                      >
+                        <span>🎵 {song.title}</span>
+                        {index === currentIndex && isPlaying && <div className="playing-effect"></div>}
+                      </div>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-          ))}
+                ))
+            ) : (
+              <p>Loading songs...</p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -128,7 +137,7 @@ const App = () => {
               src={songs[currentIndex].filePath}
               controls
               autoPlay
-              onEnded={playNext}
+              onEnded={playNext} // ✅ Auto-play next song when current ends
             ></audio>
 
             <div className="icons">
