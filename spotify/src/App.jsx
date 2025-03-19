@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
-import "./index.css";
+// import "./index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // ✅ Font Awesome for icons
 
 const API_URL = process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com"; // ✅ Dynamic API URL
