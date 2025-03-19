@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
-// import "./index.css";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // ✅ Font Awesome for icons
 
 const API_URL = process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com"; // ✅ Dynamic API URL
+const DEFAULT_IMAGE = "/img/default-song.jpg"; // ✅ Default song image
 
 const App = () => {
   const [songs, setSongs] = useState([]);
@@ -20,7 +20,7 @@ const App = () => {
         return res.json();
       })
       .then((data) => {
-        const validSongs = data.filter((song) => song.filePath); // ✅ Ensures valid file paths
+        const validSongs = data.filter((song) => song.filePath); // ✅ Ensure valid file paths
         setSongs(validSongs);
         setError(null);
       })
@@ -78,6 +78,17 @@ const App = () => {
     }
   };
 
+  // ✅ Split songs into rows of 5
+  const chunkSongs = (arr, chunkSize) => {
+    let result = [];
+    for (let i = 0; i < arr.length; i += chunkSize) {
+      result.push(arr.slice(i, i + chunkSize));
+    }
+    return result;
+  };
+
+  const songGroups = chunkSongs(songs, 5);
+
   return (
     <div>
       {/* 🔹 Navbar */}
@@ -101,26 +112,25 @@ const App = () => {
           <h1>Best of NCS - No Copyright Sounds</h1>
           <div className="song-container">
             {songs.length > 0 ? (
-              songs
-                .reduce((rows, song, index) => {
-                  if (index % 5 === 0) rows.push([]);
-                  rows[rows.length - 1].push(song);
-                  return rows;
-                }, [])
-                .map((row, rowIndex) => (
-                  <div className="song-row" key={rowIndex}>
-                    {row.map((song, index) => (
+              songGroups.map((group, rowIndex) => (
+                <div className="song-row" key={rowIndex}>
+                  {group.map((song, songIndex) => {
+                    const absoluteIndex = rowIndex * 5 + songIndex; // ✅ Fix index mapping
+                    return (
                       <div
-                        className={`s1 ${index === currentIndex ? "active playing" : ""}`}
-                        key={index}
-                        onClick={() => playSong(index)}
+                        className={`s1 ${absoluteIndex === currentIndex ? "active playing" : ""}`}
+                        key={absoluteIndex}
+                        onClick={() => playSong(absoluteIndex)}
                       >
+                        <img src={DEFAULT_IMAGE} alt={song.title} className="song-img" />
                         <span>🎵 {song.title}</span>
-                        {index === currentIndex && isPlaying && <div className="playing-effect"></div>}
+                        <p>{song.artist || "Unknown Artist"}</p>
+                        {absoluteIndex === currentIndex && isPlaying && <div className="playing-effect"></div>}
                       </div>
-                    ))}
-                  </div>
-                ))
+                    );
+                  })}
+                </div>
+              ))
             ) : (
               <p>Loading songs...</p>
             )}
