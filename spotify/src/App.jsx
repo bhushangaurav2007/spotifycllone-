@@ -85,7 +85,7 @@ const App = () => {
         <ul className="g1">
           <li className="brand">
             <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSd-eHyIHkbiQ428WtDUb7s6dFnDK3CQ7YQog&s"
+              src="./2.png"
               alt="Spotify"
             />
            BGKK-SONGS
