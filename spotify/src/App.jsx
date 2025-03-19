@@ -122,9 +122,9 @@ const App = () => {
                         key={absoluteIndex}
                         onClick={() => playSong(absoluteIndex)}
                       >
-                        <img src={DEFAULT_IMAGE} alt={song.title} className="song-img" />
+{/*                         <img src={DEFAULT_IMAGE} alt={song.title} className="song-img" /> */}
                         <span>🎵 {song.title}</span>
-                        <p>{song.artist || "Unknown Artist"}</p>
+{/*                         <p>{song.artist || "Unknown Artist"}</p> */}
                         {absoluteIndex === currentIndex && isPlaying && <div className="playing-effect"></div>}
                       </div>
                     );
