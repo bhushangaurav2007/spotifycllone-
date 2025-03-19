@@ -177,7 +177,7 @@ h1 {
 
 i {
   color: white;
-  background: red;
+/*   background: red; */
 }
 
 /* Updated songList styles to hide horizontal scrollbar while allowing scrolling */
