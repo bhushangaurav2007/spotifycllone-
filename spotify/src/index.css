@@ -66,30 +66,21 @@ body {
 
 .song-group {
   display: flex;
-  flex-direction: row;
-  overflow-x: auto;
-  overflow-y: hidden;
-  white-space: nowrap;
-  scrollbar-width: thin;
-  -ms-overflow-style: none;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 15px;
+  width: 100%;
   padding: 10px;
-  max-width: 90%;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
 }
 
-.song-group::-webkit-scrollbar {
-  display: none;
-}
-
 .s1 {
-  flex: 0 0 auto;
+  flex: 1 1 calc(20% - 20px);
+  max-width: 200px;
   text-align: center;
-  width: 200px;
-  min-width: 200px;
   background: rgba(255, 255, 255, 0.1);
-  padding: 10px;
+  padding: 12px;
   border-radius: 10px;
   transition: 0.3s;
   cursor: pointer;
@@ -198,3 +189,23 @@ body {
     opacity: 1;
   }
 }
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .s1 {
+    flex: 1 1 calc(33.33% - 20px);
+  }
+}
+
+@media (max-width: 768px) {
+  .s1 {
+    flex: 1 1 calc(50% - 20px);
+  }
+}
+
+@media (max-width: 480px) {
+  .s1 {
+    flex: 1 1 100%;
+  }
+}
+
