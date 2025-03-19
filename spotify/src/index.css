@@ -1,3 +1,4 @@
+/* ✅ General Styles */
 body {
   background-image: url(./img/bg.jpg);
   background-size: cover;
@@ -8,6 +9,7 @@ body {
   padding: 0;
 }
 
+/* ✅ Navbar */
 .g1 {
   display: flex;
   align-items: center;
@@ -21,8 +23,14 @@ body {
 .g1 li {
   padding: 0 12px;
   cursor: pointer;
+  transition: color 0.3s;
 }
 
+.g1 li:hover {
+  color: #1db954;
+}
+
+/* ✅ Brand */
 .brand img {
   width: 44px;
   padding-right: 10px;
@@ -36,6 +44,7 @@ body {
   color: red;
 }
 
+/* ✅ Page Styling */
 .page {
   min-height: 75vh;
   display: flex;
@@ -56,6 +65,7 @@ body {
   text-align: center;
 }
 
+/* ✅ Song List */
 .songList {
   display: flex;
   flex-direction: column;
@@ -64,6 +74,7 @@ body {
   width: 100%;
 }
 
+/* ✅ Song Group - Now supports multiple rows */
 .song-group {
   display: flex;
   flex-wrap: wrap;
@@ -75,6 +86,7 @@ body {
   border-radius: 10px;
 }
 
+/* ✅ Individual Song Box */
 .s1 {
   flex: 1 1 calc(20% - 20px);
   max-width: 200px;
@@ -90,11 +102,13 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
+/* ✅ Playing Song Highlight */
 .playing {
   color: #1db954;
   font-weight: bold;
 }
 
+/* ✅ Playing Effect */
 .playing-effect {
   width: 10px;
   height: 10px;
@@ -103,6 +117,7 @@ body {
   animation: pulse 1.2s infinite;
 }
 
+/* ✅ Pulse Animation */
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -122,6 +137,7 @@ body {
   }
 }
 
+/* ✅ Scroll Buttons */
 .scroll-container {
   display: flex;
   align-items: center;
@@ -145,6 +161,7 @@ body {
   background: #1ed760;
 }
 
+/* ✅ Bottom Music Player */
 .bottom {
   position: fixed;
   bottom: 0;
@@ -158,10 +175,12 @@ body {
   justify-content: center;
 }
 
+/* ✅ Player Icons */
 .icons i {
   cursor: pointer;
   margin: 0 15px;
   transition: 0.2s;
+  font-size: 24px;
 }
 
 .icons i:hover {
@@ -169,18 +188,21 @@ body {
   transform: scale(1.1);
 }
 
+/* ✅ Progress Bar */
 #myProgressBar {
   width: 80vw;
   cursor: pointer;
   margin-top: 10px;
 }
 
+/* ✅ Song Info */
 .songInfo {
   font-size: 18px;
   font-weight: bold;
   animation: fadeIn 1s ease-in-out;
 }
 
+/* ✅ Fade-In Animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -190,7 +212,7 @@ body {
   }
 }
 
-/* Responsive Design */
+/* ✅ Responsive Design */
 @media (max-width: 1024px) {
   .s1 {
     flex: 1 1 calc(33.33% - 20px);
@@ -207,5 +229,12 @@ body {
   .s1 {
     flex: 1 1 100%;
   }
-}
 
+  .bottom {
+    height: 80px;
+  }
+
+  .icons i {
+    font-size: 20px;
+  }
+}
