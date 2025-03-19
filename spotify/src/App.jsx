@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // ✅ Font Awesome for icons
 
-const API_URL = process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com"; // ✅ Dynamic API URL
-const DEFAULT_IMAGE = "/img/default-song.jpg"; // ✅ Default song image
+const API_URL = process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com";
+const DEFAULT_IMAGE = "/img/default-song.jpg";
 
 const App = () => {
   const [songs, setSongs] = useState([]);
@@ -11,6 +11,7 @@ const App = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState(null);
   const audioRef = useRef(null);
+  const scrollRefs = useRef([]); // ✅ Array of refs for multiple rows
 
   // ✅ Fetch songs from backend
   useEffect(() => {
@@ -20,7 +21,7 @@ const App = () => {
         return res.json();
       })
       .then((data) => {
-        const validSongs = data.filter((song) => song.filePath); // ✅ Ensure valid file paths
+        const validSongs = data.filter((song) => song.filePath);
         setSongs(validSongs);
         setError(null);
       })
@@ -42,7 +43,7 @@ const App = () => {
   // ✅ Play selected song
   const playSong = (index) => {
     if (index === currentIndex) {
-      togglePlayPause(); // Toggle if same song is clicked
+      togglePlayPause();
     } else {
       setCurrentIndex(index);
       setIsPlaying(true);
@@ -78,7 +79,20 @@ const App = () => {
     }
   };
 
-  // ✅ Split songs into rows of 5
+  // ✅ Scroll functions
+  const scrollLeft = (index) => {
+    if (scrollRefs.current[index]) {
+      scrollRefs.current[index].scrollBy({ left: -300, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = (index) => {
+    if (scrollRefs.current[index]) {
+      scrollRefs.current[index].scrollBy({ left: 300, behavior: "smooth" });
+    }
+  };
+
+  // ✅ Chunk songs into groups of 5 for multiple rows
   const chunkSongs = (arr, chunkSize) => {
     let result = [];
     for (let i = 0; i < arr.length; i += chunkSize) {
@@ -87,7 +101,7 @@ const App = () => {
     return result;
   };
 
-  const songGroups = chunkSongs(songs, 5);
+  const songGroups = chunkSongs(songs, 5); // ✅ Grouping songs into rows
 
   return (
     <div>
@@ -106,35 +120,36 @@ const App = () => {
       {/* 🔹 Error Message */}
       {error && <p className="error">❌ {error}</p>}
 
-      {/* 🔹 Song List in Rows (5 per row) */}
+      {/* 🔹 Multiple Horizontal Rows */}
       <div className="page">
         <div className="hero">
           <h1>Best of NCS - No Copyright Sounds</h1>
-          <div className="song-container">
-            {songs.length > 0 ? (
-              songGroups.map((group, rowIndex) => (
-                <div className="song-row" key={rowIndex}>
-                  {group.map((song, songIndex) => {
-                    const absoluteIndex = rowIndex * 5 + songIndex; // ✅ Fix index mapping
-                    return (
-                      <div
-                        className={`s1 ${absoluteIndex === currentIndex ? "active playing" : ""}`}
-                        key={absoluteIndex}
-                        onClick={() => playSong(absoluteIndex)}
-                      >
-{/*                         <img src={DEFAULT_IMAGE} alt={song.title} className="song-img" /> */}
-                        <span>🎵 {song.title}</span>
-{/*                         <p>{song.artist || "Unknown Artist"}</p> */}
-                        {absoluteIndex === currentIndex && isPlaying && <div className="playing-effect"></div>}
-                      </div>
-                    );
-                  })}
-                </div>
-              ))
-            ) : (
-              <p>Loading songs...</p>
-            )}
-          </div>
+
+          {songGroups.map((group, rowIndex) => (
+            <div className="scroll-container" key={rowIndex}>
+              <button className="scroll-btn left" onClick={() => scrollLeft(rowIndex)}>◀</button>
+              
+              <div className="songList" ref={(el) => (scrollRefs.current[rowIndex] = el)}>
+                {group.map((song, songIndex) => {
+                  const absoluteIndex = rowIndex * 5 + songIndex; // ✅ Calculate absolute index
+                  return (
+                    <div
+                      className={`s1 ${absoluteIndex === currentIndex ? "active playing" : ""}`}
+                      key={absoluteIndex}
+                      onClick={() => playSong(absoluteIndex)}
+                    >
+{/*                       <img src={DEFAULT_IMAGE} alt={song.title} className="song-img" /> */}
+                      <span>🎵 {song.title}</span>
+{/*                       <p>{song.artist || "Unknown Artist"}</p> */}
+                      {absoluteIndex === currentIndex && isPlaying && <div className="playing-effect"></div>}
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button className="scroll-btn right" onClick={() => scrollRight(rowIndex)}>▶</button>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -147,7 +162,7 @@ const App = () => {
               src={songs[currentIndex].filePath}
               controls
               autoPlay
-              onEnded={playNext} // ✅ Auto-play next song when current ends
+              onEnded={playNext}
             ></audio>
 
             <div className="icons">
