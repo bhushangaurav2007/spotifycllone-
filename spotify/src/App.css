@@ -22,6 +22,7 @@
 /* ✅ Scroll Buttons for Each Row */
 .scroll-container {
   display: flex;
+   flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 10px;
