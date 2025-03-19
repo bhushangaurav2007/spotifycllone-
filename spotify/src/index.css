@@ -189,8 +189,15 @@ i {
     -ms-overflow-style: none; /* Hide scrollbar in IE */
     gap: 15px;
     padding: 10px;
+    max-width: 500px
 }
 
 .songList::-webkit-scrollbar {
     display: none; /* Hide scrollbar in Chrome, Safari, Edge */
+}
+
+.s1 {
+    flex: 0 0 auto;
+    text-align: center;
+    width: 150px;
 }
