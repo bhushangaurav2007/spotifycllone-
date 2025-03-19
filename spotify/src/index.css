@@ -1,10 +1,8 @@
 body {
-  /* background-color: #121212; */
   background-image: url(./img/bg.jpg);
   background-size: cover;
   background-repeat: no-repeat;
   color: white;
-  /* background-image: url(/img/bg2.jpg); */
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
@@ -42,10 +40,9 @@ body {
   min-height: 75vh;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
   margin: 10px auto;
-  width: 70%;
+  width: 80%;
   border-radius: 12px;
   padding: 20px;
   background: linear-gradient(to right, #2e2e2e, #1c1c1c);
@@ -56,29 +53,105 @@ body {
 
 .hero {
   width: 100%;
+  text-align: center;
+}
+
+.songList {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+}
+
+.song-group {
+  display: flex;
+  flex-direction: row;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  scrollbar-width: thin;
+  -ms-overflow-style: none;
+  gap: 15px;
+  padding: 10px;
+  max-width: 90%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.song-group::-webkit-scrollbar {
+  display: none;
 }
 
 .s1 {
-  display: flex;
-  align-items: center;
-  background-color: transparent;
-  width: 100%;
-  color: white;
-  margin: 8px 0;
-  padding: 12px;
+  flex: 0 0 auto;
+  text-align: center;
+  width: 200px;
+  min-width: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 10px;
   border-radius: 10px;
-  cursor: pointer;
   transition: 0.3s;
+  cursor: pointer;
 }
 
 .s1:hover {
-  background-color: rgba(0, 0, 0, 0.641);
-  text-shadow: 0 0 8px red;
+  background: rgba(255, 255, 255, 0.2);
 }
 
-.s1 span {
-  margin-left: 10px;
-  background-color: transparent;
+.playing {
+  color: #1db954;
+  font-weight: bold;
+}
+
+.playing-effect {
+  width: 10px;
+  height: 10px;
+  background-color: #1db954;
+  border-radius: 50%;
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  30% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(1.5);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+}
+
+.scroll-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.scroll-btn {
+  background: #1db954;
+  color: white;
+  font-size: 20px;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: 0.3s;
+}
+
+.scroll-btn:hover {
+  background: #1ed760;
 }
 
 .bottom {
@@ -125,122 +198,3 @@ body {
     opacity: 1;
   }
 }
-
-a {
-  text-decoration: none;
-  color: red;
-  font-size: 25px;
-}
-
-h1 {
-  align-self: center;
-}
-
-#root {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-around;
-  align-items: normal;
-}
-
-.playing {
-  color: #1db954;
-  font-weight: bold;
-}
-
-.playing-effect {
-  width: 10px;
-  height: 10px;
-  background-color: #1db954;
-  border-radius: 50%;
-  animation: pulse 1.2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  30% {
-    transform: scale(1.3);
-    opacity: 1;
-  }
-  70% {
-    transform: scale(1.5);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-}
-
-i {
-  color: white;
-/*   background: red; */
-}
-
-/* Updated songList styles to hide horizontal scrollbar while allowing scrolling */
-.songList {
-    display: flex;
-    flex-direction: row; 
-    overflow-x: auto; 
-    overflow-y: hidden; 
-    white-space: nowrap; 
-    scrollbar-width: thin; 
-    -ms-overflow-style: none; 
-    gap: 15px;
-    padding: 10px;
-    max-width: 90%; 
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    margin: auto;
-}
-
-.songList::-webkit-scrollbar {
-    display: none;
-}
-
-.s1 {
-    flex: 0 0 auto;
-    text-align: center;
-    width: 200px; 
-    min-width: 200px; 
-    background: rgba(255, 255, 255, 0.1);
-    padding: 10px;
-    border-radius: 10px;
-    transition: 0.3s;
-    cursor: pointer;
-}
-
-.s1:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.playing {
-    color: #1db954;
-    font-weight: bold;
-}
-
-.scroll-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-}
-
-.scroll-btn {
-    background: #1db954;
-    color: white;
-    font-size: 20px;
-    border: none;
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 50%;
-    transition: 0.3s;
-}
-
-.scroll-btn:hover {
-    background: #1ed760;
-}
-
