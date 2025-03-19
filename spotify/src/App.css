@@ -161,6 +161,9 @@ body {
   padding: 10px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
+  max-width:90%;
+  max-height:50;
+  height:100%;
 }
 
 /* ✅ Individual Song Box */
