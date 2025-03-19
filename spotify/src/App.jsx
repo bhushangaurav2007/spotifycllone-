@@ -88,7 +88,7 @@ const App = () => {
               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSd-eHyIHkbiQ428WtDUb7s6dFnDK3CQ7YQog&s"
               alt="Spotify"
             />
-            Spotify Clone
+           BGKK-SONGS
           </li>
           <li>Home</li>
           <li>About</li>
