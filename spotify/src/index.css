@@ -183,16 +183,18 @@ i {
 /* Updated songList styles to hide horizontal scrollbar while allowing scrolling */
 .songList {
     display: flex;
+    flex-direction: row; /* Ensure horizontal layout */
     overflow-x: auto; /* Enables horizontal scrolling */
     overflow-y: hidden; /* Prevents vertical scrolling */
-    white-space: nowrap;
+    white-space: nowrap; /* Prevents wrapping */
     scrollbar-width: thin; /* Firefox */
     -ms-overflow-style: none; /* IE/Edge */
     gap: 15px;
     padding: 10px;
-    max-width: 100%;
+    max-width: 90%; /* Adjust as needed */
     background: rgba(255, 255, 255, 0.05);
     border-radius: 10px;
+    margin: auto; /* Center the list */
 }
 
 /* Hide scrollbar in Chrome, Safari */
@@ -203,8 +205,8 @@ i {
 .s1 {
     flex: 0 0 auto;
     text-align: center;
-    width: 180px;
-    min-width: 180px;
+    width: 200px; /* Set fixed width */
+    min-width: 200px; /* Prevent shrinking */
     background: rgba(255, 255, 255, 0.1);
     padding: 10px;
     border-radius: 10px;
@@ -225,6 +227,7 @@ i {
 .scroll-container {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
 }
 
@@ -242,3 +245,4 @@ i {
 .scroll-btn:hover {
     background: #1ed760;
 }
+
