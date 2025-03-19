@@ -1,3 +1,4 @@
+/* ✅ Root container styling */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -5,44 +6,8 @@
   text-align: center;
 }
 
-/* ✅ Logo Styles */
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-/* ✅ Bottom Controls (Music Player UI) */
+/* ✅ Music Player UI - Bottom Controls */
 .bottom-controls {
   position: fixed;
   bottom: 0;
@@ -51,14 +16,13 @@
   height: 100px;
   background-color: black;
   display: flex;
-  /* flex-direction: column; */
   align-items: center;
-  justify-content: space-evenly
+  justify-content: space-evenly;
 }
 
 /* ✅ Buttons for Player Controls */
 button {
-  background-color: #000000;
+  background-color: #000;
   border: none;
   color: rgb(255, 0, 0);
   padding: 8px 15px;
@@ -69,7 +33,7 @@ button {
 }
 
 button:hover {
-  background-color: transparent;
+  background-color: rgba(255, 0, 0, 0.2);
 }
 
 /* ✅ Song List */
@@ -81,43 +45,45 @@ button:hover {
   margin-top: 20px;
 }
 
+/* ✅ Individual Song Box */
 .s1 {
   background: #282828;
   width: 80%;
-  padding: 10px;
+  padding: 12px;
   border-radius: 8px;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.3s ease-in-out;
+  text-align: center;
 }
 
 .s1:hover {
-  background: #333;
+  background: #444;
+  transform: scale(1.05);
 }
 
-/* ✅ Song Info */
-.songInfo {
-  font-size: 16px;
-  margin-bottom: 10px;
-}
-
+/* ✅ Playing Song Highlight */
 .playing {
   color: #1db954;
   font-weight: bold;
 }
 
+/* ✅ Playing Effect Animation */
 .playing-effect {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
   background-color: #1db954;
   border-radius: 50%;
   animation: pulse 1.2s infinite;
 }
 
+/* ✅ Pulse Animation for Playing Effect */
 @keyframes pulse {
   0% { transform: scale(1); opacity: 0.7; }
   50% { transform: scale(1.5); opacity: 1; }
   100% { transform: scale(1); opacity: 0.7; }
 }
+
+/* ✅ Background Styling */
 body {
   background-image: url(./img/bg.jpg);
   background-size: cover;
@@ -128,6 +94,7 @@ body {
   padding: 0;
 }
 
+/* ✅ Navbar Styling */
 .g1 {
   display: flex;
   align-items: center;
@@ -141,8 +108,14 @@ body {
 .g1 li {
   padding: 0 12px;
   cursor: pointer;
+  transition: color 0.3s;
 }
 
+.g1 li:hover {
+  color: #1db954;
+}
+
+/* ✅ Brand Styling */
 .brand img {
   width: 44px;
   padding-right: 10px;
@@ -156,6 +129,7 @@ body {
   color: red;
 }
 
+/* ✅ Page Content */
 .page {
   min-height: 75vh;
   display: flex;
@@ -171,19 +145,13 @@ body {
   background-repeat: no-repeat;
 }
 
+/* ✅ Song Container */
 .hero {
   width: 100%;
   text-align: center;
 }
 
-.songList {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  width: 100%;
-}
-
+/* ✅ Song Group */
 .song-group {
   display: flex;
   flex-wrap: wrap;
@@ -195,6 +163,7 @@ body {
   border-radius: 10px;
 }
 
+/* ✅ Individual Song Box */
 .s1 {
   flex: 1 1 calc(20% - 20px);
   max-width: 200px;
@@ -210,38 +179,7 @@ body {
   background: rgba(255, 255, 255, 0.2);
 }
 
-.playing {
-  color: #1db954;
-  font-weight: bold;
-}
-
-.playing-effect {
-  width: 10px;
-  height: 10px;
-  background-color: #1db954;
-  border-radius: 50%;
-  animation: pulse 1.2s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-  30% {
-    transform: scale(1.3);
-    opacity: 1;
-  }
-  70% {
-    transform: scale(1.5);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.7;
-  }
-}
-
+/* ✅ Scroll Buttons */
 .scroll-container {
   display: flex;
   align-items: center;
@@ -265,6 +203,7 @@ body {
   background: #1ed760;
 }
 
+/* ✅ Bottom Player */
 .bottom {
   position: fixed;
   bottom: 0;
@@ -278,10 +217,12 @@ body {
   justify-content: center;
 }
 
+/* ✅ Player Icons */
 .icons i {
   cursor: pointer;
   margin: 0 15px;
   transition: 0.2s;
+  font-size: 24px;
 }
 
 .icons i:hover {
@@ -289,28 +230,27 @@ body {
   transform: scale(1.1);
 }
 
+/* ✅ Progress Bar */
 #myProgressBar {
   width: 80vw;
   cursor: pointer;
   margin-top: 10px;
 }
 
+/* ✅ Song Info */
 .songInfo {
   font-size: 18px;
   font-weight: bold;
   animation: fadeIn 1s ease-in-out;
 }
 
+/* ✅ Fade-In Animation */
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-/* Responsive Design */
+/* ✅ Responsive Design */
 @media (max-width: 1024px) {
   .s1 {
     flex: 1 1 calc(33.33% - 20px);
@@ -326,5 +266,13 @@ body {
 @media (max-width: 480px) {
   .s1 {
     flex: 1 1 100%;
+  }
+
+  .bottom {
+    height: 80px;
+  }
+
+  .icons i {
+    font-size: 20px;
   }
 }
