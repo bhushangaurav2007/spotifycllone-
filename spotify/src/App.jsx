@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import "./App.css";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // ✅ Font Awesome for icons
 
-const API_URL =
-  process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com"; // ✅ Dynamic API URL
+const API_URL = process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com"; // ✅ Dynamic API URL
 
 const App = () => {
   const [songs, setSongs] = useState([]);
@@ -11,6 +10,7 @@ const App = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [error, setError] = useState(null);
   const audioRef = useRef(null);
+  const songListRef = useRef(null);
 
   // ✅ Fetch songs from backend
   useEffect(() => {
@@ -78,17 +78,27 @@ const App = () => {
     }
   };
 
+  // ✅ Scroll Functions
+  const scrollLeft = () => {
+    if (songListRef.current) {
+      songListRef.current.scrollBy({ left: -200, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (songListRef.current) {
+      songListRef.current.scrollBy({ left: 200, behavior: "smooth" });
+    }
+  };
+
   return (
     <div>
       {/* 🔹 Navbar */}
       <nav>
         <ul className="g1">
           <li className="brand">
-            <img
-              src="./2.png"
-              alt="Spotify"
-            />
-           BGKK-SONGS
+            <img src="./2.png" alt="Spotify" />
+            BGKK-SONGS
           </li>
           <li>Home</li>
           <li>About</li>
@@ -102,23 +112,29 @@ const App = () => {
       <div className="page">
         <div className="hero">
           <h1>Best of NCS - No Copyright Sounds</h1>
-          <div className="songList">
-            {songs.length > 0 ? (
-              songs.map((song, index) => (
-                <div
-                  className={`s1 ${index === currentIndex ? "active playing" : ""}`} // ✅ Highlights playing song
-                  key={index}
-                  onClick={() => playSong(index)}
-                >
-                  <span>🎵 {song.title}</span>
-                  {index === currentIndex && isPlaying && (
-                    <div className="playing-effect"></div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <p>Loading songs...</p>
-            )}
+          <div className="scroll-container">
+            <button className="scroll-btn" onClick={scrollLeft}>
+              &larr;
+            </button>
+            <div className="songList" ref={songListRef}>
+              {songs.length > 0 ? (
+                songs.map((song, index) => (
+                  <div
+                    className={`s1 ${index === currentIndex ? "active playing" : ""}`}
+                    key={index}
+                    onClick={() => playSong(index)}
+                  >
+                    <span>🎵 {song.title}</span>
+                    {index === currentIndex && isPlaying && <div className="playing-effect"></div>}
+                  </div>
+                ))
+              ) : (
+                <p>Loading songs...</p>
+              )}
+            </div>
+            <button className="scroll-btn" onClick={scrollRight}>
+              &rarr;
+            </button>
           </div>
         </div>
       </div>
