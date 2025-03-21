@@ -6,16 +6,15 @@
   text-align: center;
 }
 
-/* ✅ Song List - Vertical scrolling with rows */
+/* ✅ Song List - Horizontal scrolling with rows */
 .songList {
-  display: flex; /* Flex container */
-  flex-direction: column; /* Stack rows vertically */
-  align-items: center; /* Center-align rows horizontally */
-  overflow-y: auto; /* Enable vertical scrolling */
+  display: flex; /* Flex container for rows */
+  flex-direction: row; /* Align rows horizontally */
+  overflow-x: auto; /* Enable horizontal scrolling */
   gap: 20px; /* Space between rows */
   padding: 10px;
   width: 100%; /* Full width of the container */
-  height: 500px; /* Set a fixed height for the vertical scroll area */
+  height: auto; /* Allow rows to adjust height dynamically */
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
@@ -23,9 +22,9 @@
   scrollbar-color: #1db954 #333; /* Thumb and track colors */
 }
 
-/* ✅ Custom Scrollbar Styling */
+/* ✅ Custom Scrollbar Styling for Horizontal Scrolling */
 .songList::-webkit-scrollbar {
-  width: 8px; /* Vertical scrollbar width */
+  height: 8px; /* Horizontal scrollbar height */
 }
 
 .songList::-webkit-scrollbar-thumb {
@@ -37,15 +36,16 @@
   background: #333; /* Scrollbar track color */
 }
 
-/* ✅ Song Group - Horizontal row of songs */
+/* ✅ Song Group - Ensure Horizontal Alignment */
 .song-group {
-  display: flex; /* Align songs in a single row */
-  justify-content: center; /* Center-align songs within the row */
-  gap: 15px; /* Space between songs in a row */
+  display: flex; /* Keep songs in a single row */
+  justify-content: start; /* Align songs to the start of the row */
+  gap: 15px; /* Space between songs */
   width: 100%; /* Full width for rows */
   padding: 10px;
   background: rgba(255, 255, 255, 0.1); /* Light transparent background for rows */
   border-radius: 10px;
+  overflow-x: auto; /* Allow songs to scroll horizontally */
 }
 
 /* ✅ Individual Song Box */
