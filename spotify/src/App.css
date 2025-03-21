@@ -6,27 +6,29 @@
   text-align: center;
 }
 
-/* ✅ Song List - Grid Display (5 Songs Per Row) */
+/* ✅ Horizontal Scrolling Song List */
 .songList {
-  display: grid; /* ✅ Use CSS Grid for row-based layout */
-  grid-template-columns: repeat(5, 1fr); /* ✅ 5 songs per row */
-  gap: 20px; /* Spacing between songs */
-  justify-items: center;
+  display: flex; /* ✅ Flexbox for horizontal alignment */
+  flex-direction: row; /* Songs in a single horizontal row */
   align-items: center;
+  justify-content: flex-start;
+  overflow-x: auto; /* ✅ Enable horizontal scrolling */
+  gap: 20px; /* Spacing between songs */
   padding: 10px;
-  width: 90%;
+  width: 90%; /* Width of the song list container */
   margin: 0 auto;
-  overflow-y: auto; /* ✅ Enable vertical scrolling if needed */
-  max-height: 500px; /* Limit height for scrollable rows */
+  white-space: nowrap; /* Prevent songs from wrapping into new rows */
+  scroll-behavior: smooth; /* Smooth scrolling effect */
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
   scrollbar-width: thin;
   scrollbar-color: #1db954 #333;
+  max-height: 150px; /* To ensure a consistent height */
 }
 
 /* ✅ Custom Scrollbar Styling */
 .songList::-webkit-scrollbar {
-  width: 8px;
+  height: 8px; /* Horizontal scrollbar height */
 }
 
 .songList::-webkit-scrollbar-thumb {
@@ -40,15 +42,15 @@
 
 /* ✅ Individual Song Box */
 .s1 {
+  flex: 0 0 auto; /* Ensure items don’t shrink or grow */
   text-align: center;
   background: rgba(255, 255, 255, 0.1);
   padding: 12px;
   border-radius: 10px;
   transition: 0.3s;
   cursor: pointer;
-  height: 100px;
-  width: 100%; /* Ensures consistent width */
-  max-width: 200px;
+  height: 100px; /* Fixed height for songs */
+  width: 150px; /* Fixed width for songs */
 }
 
 .s1:hover {
@@ -202,28 +204,23 @@ body {
 
 /* ✅ Responsive Design */
 @media (max-width: 1024px) {
-  .songList {
-    grid-template-columns: repeat(3, 1fr); /* 3 songs per row on medium screens */
-  }
-
   .s1 {
-    max-width: 150px;
+    width: 120px;
+    height: 90px;
   }
 }
 
 @media (max-width: 768px) {
-  .songList {
-    grid-template-columns: repeat(2, 1fr); /* 2 songs per row on small screens */
-  }
-
   .s1 {
-    max-width: 120px;
+    width: 100px;
+    height: 80px;
   }
 }
 
 @media (max-width: 480px) {
-  .songList {
-    grid-template-columns: 1fr; /* 1 song per row on mobile screens */
+  .s1 {
+    width: 80px;
+    height: 70px;
   }
 
   .bottom {
