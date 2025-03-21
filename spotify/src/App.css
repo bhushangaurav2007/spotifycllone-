@@ -181,15 +181,8 @@ body {
 }
 
 .icons i:hover {
-  color: #1DB954;
+  color: #1db954;
   transform: scale(1.1);
-}
-
-/* ✅ Progress Bar */
-#myProgressBar {
-  width: 80vw;
-  cursor: pointer;
-  margin-top: 10px;
 }
 
 /* ✅ Song Info */
