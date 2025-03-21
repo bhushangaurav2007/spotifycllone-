@@ -3,7 +3,6 @@ import "./App.css";
 import "@fortawesome/fontawesome-free/css/all.min.css"; // ✅ Font Awesome for icons
 
 const API_URL = process.env.REACT_APP_API_URL || "https://spotifycllone.onrender.com";
-const DEFAULT_IMAGE = "/img/default-song.jpg";
 
 const App = () => {
   const [songs, setSongs] = useState([]);
@@ -103,6 +102,21 @@ const App = () => {
 
   const songGroups = chunkSongs(songs, 5); // ✅ Grouping songs into rows
 
+  // 🔹 Auto-play and auto-scroll effect when songs load
+  useEffect(() => {
+    if (songs.length > 0) {
+      // Auto-play the first song
+      setCurrentIndex(0);
+
+      // Auto-scroll to the first song in all rows
+      scrollRefs.current.forEach((ref) => {
+        if (ref) {
+          ref.scrollTo({ left: 0, behavior: "smooth" });
+        }
+      });
+    }
+  }, [songs]);
+
   return (
     <div>
       {/* 🔹 Navbar */}
@@ -131,16 +145,14 @@ const App = () => {
               
               <div className="songList" ref={(el) => (scrollRefs.current[rowIndex] = el)}>
                 {group.map((song, songIndex) => {
-                  const absoluteIndex = rowIndex * 5 + songIndex; // ✅ Calculate absolute index
+                  const absoluteIndex = rowIndex * 8 + songIndex; // ✅ Calculate absolute index
                   return (
                     <div
                       className={`s1 ${absoluteIndex === currentIndex ? "active playing" : ""}`}
                       key={absoluteIndex}
                       onClick={() => playSong(absoluteIndex)}
                     >
-{/*                       <img src={DEFAULT_IMAGE} alt={song.title} className="song-img" /> */}
                       <span>🎵 {song.title}</span>
-{/*                       <p>{song.artist || "Unknown Artist"}</p> */}
                       {absoluteIndex === currentIndex && isPlaying && <div className="playing-effect"></div>}
                     </div>
                   );
