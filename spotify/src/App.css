@@ -6,55 +6,62 @@
   text-align: center;
 }
 
-/* ✅ Horizontal Scrolling Song List */
+/* ✅ Song List - Vertical scrolling with rows */
 .songList {
-  display: flex; /* ✅ Flexbox for horizontal alignment */
-  flex-direction: row; /* Songs in a single horizontal row */
-  align-items: center;
-  justify-content: flex-start;
-  overflow-x: auto; /* ✅ Enable horizontal scrolling */
-  gap: 20px; /* Spacing between songs */
+  display: flex; /* Flex container */
+  flex-direction: column; /* Stack rows vertically */
+  align-items: center; /* Center-align rows horizontally */
+  overflow-y: auto; /* Enable vertical scrolling */
+  gap: 20px; /* Space between rows */
   padding: 10px;
-  width: 90%; /* Width of the song list container */
+  width: 100%; /* Full width of the container */
+  height: 500px; /* Set a fixed height for the vertical scroll area */
   margin: 0 auto;
-  white-space: nowrap; /* Prevent songs from wrapping into new rows */
-  scroll-behavior: smooth; /* Smooth scrolling effect */
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
-  scrollbar-width: thin;
-  scrollbar-color: #1db954 #333;
-  max-height: 150px; /* To ensure a consistent height */
+  scrollbar-width: thin; /* Custom scrollbar width */
+  scrollbar-color: #1db954 #333; /* Thumb and track colors */
 }
 
 /* ✅ Custom Scrollbar Styling */
 .songList::-webkit-scrollbar {
-  height: 8px; /* Horizontal scrollbar height */
+  width: 8px; /* Vertical scrollbar width */
 }
 
 .songList::-webkit-scrollbar-thumb {
-  background: #1db954;
+  background: #1db954; /* Scrollbar thumb color */
   border-radius: 5px;
 }
 
 .songList::-webkit-scrollbar-track {
-  background: #333;
+  background: #333; /* Scrollbar track color */
+}
+
+/* ✅ Song Group - Horizontal row of songs */
+.song-group {
+  display: flex; /* Align songs in a single row */
+  justify-content: center; /* Center-align songs within the row */
+  gap: 15px; /* Space between songs in a row */
+  width: 100%; /* Full width for rows */
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.1); /* Light transparent background for rows */
+  border-radius: 10px;
 }
 
 /* ✅ Individual Song Box */
 .s1 {
-  flex: 0 0 auto; /* Ensure items don’t shrink or grow */
+  flex: 0 0 calc(20% - 10px); /* Ensure 5 songs fit per row */
+  max-width: 200px; /* Max width for each song box */
   text-align: center;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
   padding: 12px;
   border-radius: 10px;
   transition: 0.3s;
   cursor: pointer;
-  height: 100px; /* Fixed height for songs */
-  width: 150px; /* Fixed width for songs */
 }
 
 .s1:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
   transform: scale(1.05);
 }
 
@@ -205,22 +212,19 @@ body {
 /* ✅ Responsive Design */
 @media (max-width: 1024px) {
   .s1 {
-    width: 120px;
-    height: 90px;
+    flex: 0 0 calc(33.33% - 10px); /* 3 songs per row on medium screens */
   }
 }
 
 @media (max-width: 768px) {
   .s1 {
-    width: 100px;
-    height: 80px;
+    flex: 0 0 calc(50% - 10px); /* 2 songs per row on tablets */
   }
 }
 
 @media (max-width: 480px) {
   .s1 {
-    width: 80px;
-    height: 70px;
+    flex: 0 0 100%; /* 1 song per row on mobile */
   }
 
   .bottom {
