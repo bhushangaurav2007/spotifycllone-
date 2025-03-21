@@ -6,21 +6,22 @@
   text-align: center;
 }
 
-/* ✅ Song List - Vertical Scroll */
+/* ✅ Song List - Grid Display (5 Songs Per Row) */
 .songList {
-  display: flex;
-  flex-direction: column; /* ✅ Songs stack vertically */
+  display: grid; /* ✅ Use CSS Grid for row-based layout */
+  grid-template-columns: repeat(5, 1fr); /* ✅ 5 songs per row */
+  gap: 20px; /* Spacing between songs */
+  justify-items: center;
   align-items: center;
-  overflow-y: auto; /* ✅ Enable vertical scrolling */
-  gap: 15px;
   padding: 10px;
   width: 90%;
-  max-height: calc(5 * 100px); /* ✅ Display 5 songs at a time, adjust song height if needed */
-  scroll-behavior: smooth;
+  margin: 0 auto;
+  overflow-y: auto; /* ✅ Enable vertical scrolling if needed */
+  max-height: 500px; /* Limit height for scrollable rows */
   background: rgba(255, 255, 255, 0.05);
   border-radius: 10px;
-  scrollbar-width: thin; /* Modern browser support for thinner scrollbar */
-  scrollbar-color: #1db954 #333; /* Custom scrollbar colors */
+  scrollbar-width: thin;
+  scrollbar-color: #1db954 #333;
 }
 
 /* ✅ Custom Scrollbar Styling */
@@ -29,61 +30,25 @@
 }
 
 .songList::-webkit-scrollbar-thumb {
-  background: #1db954; /* Scrollbar thumb */
+  background: #1db954;
   border-radius: 5px;
 }
 
 .songList::-webkit-scrollbar-track {
-  background: #333; /* Scrollbar track */
-}
-
-/* ✅ Scroll Buttons for Row (Optional) */
-.scroll-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.scroll-btn {
-  background: #1db954;
-  color: white;
-  font-size: 20px;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 50%;
-  transition: 0.3s;
-}
-
-.scroll-btn:hover {
-  background: #1ed760;
-}
-
-/* ✅ Song Groups - Adjust for single column behavior */
-.song-group {
-  display: flex;
-  flex-direction: column; /* ✅ Ensure single-column layout */
-  gap: 10px;
-  width: 100%;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-  overflow: hidden;
+  background: #333;
 }
 
 /* ✅ Individual Song Box */
 .s1 {
-  flex: 0 0 100px; /* ✅ Fixed height for each song */
-  width: 100%; /* ✅ Stretch to full width of container */
-  max-width: 400px; /* ✅ Optional max width */
   text-align: center;
   background: rgba(255, 255, 255, 0.1);
   padding: 12px;
   border-radius: 10px;
   transition: 0.3s;
   cursor: pointer;
+  height: 100px;
+  width: 100%; /* Ensures consistent width */
+  max-width: 200px;
 }
 
 .s1:hover {
@@ -108,9 +73,18 @@
 
 /* ✅ Pulse Animation for Playing Effect */
 @keyframes pulse {
-  0% { transform: scale(1); opacity: 0.7; }
-  50% { transform: scale(1.5); opacity: 1; }
-  100% { transform: scale(1); opacity: 0.7; }
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
 }
 
 /* ✅ Background Styling */
@@ -218,26 +192,38 @@ body {
 
 /* ✅ Fade-In Animation */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ✅ Responsive Design */
 @media (max-width: 1024px) {
+  .songList {
+    grid-template-columns: repeat(3, 1fr); /* 3 songs per row on medium screens */
+  }
+
   .s1 {
-    flex: 0 0 calc(33.33% - 10px); /* ✅ Adjust for medium screens */
+    max-width: 150px;
   }
 }
 
 @media (max-width: 768px) {
+  .songList {
+    grid-template-columns: repeat(2, 1fr); /* 2 songs per row on small screens */
+  }
+
   .s1 {
-    flex: 0 0 calc(50% - 10px); /* ✅ Adjust for tablets */
+    max-width: 120px;
   }
 }
 
 @media (max-width: 480px) {
-  .s1 {
-    flex: 0 0 100%; /* ✅ Full width on mobile */
+  .songList {
+    grid-template-columns: 1fr; /* 1 song per row on mobile screens */
   }
 
   .bottom {
