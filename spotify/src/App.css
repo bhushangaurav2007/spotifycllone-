@@ -6,6 +6,51 @@
   text-align: center;
 }
 
+/* ✅ Navbar Styling */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: #282828;
+  color: white;
+}
+
+.navbar-list {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  padding: 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+}
+
+.brand-logo {
+  height: 40px;
+  margin-right: 10px;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+}
+
+.search-bar {
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  outline: none;
+  margin-right: 5px;
+}
+
+.search-icon {
+  font-size: 20px;
+  cursor: pointer;
+}
+
 /* ✅ Song List - Horizontal scrolling with rows */
 .songList {
   display: flex; /* Flex container for rows */
@@ -22,7 +67,6 @@
   scrollbar-color: #1db954 #333; /* Thumb and track colors */
 }
 
-/* ✅ Custom Scrollbar Styling for Horizontal Scrolling */
 .songList::-webkit-scrollbar {
   height: 8px; /* Horizontal scrollbar height */
 }
@@ -65,13 +109,23 @@
   transform: scale(1.05);
 }
 
+.song-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #ccc;
+  transition: background-color 0.3s ease;
+}
+
+.song-item:hover {
+  background-color: #ececec;
+}
+
 /* ✅ Playing Song Highlight */
 .playing {
   color: #1db954;
   font-weight: bold;
 }
 
-/* ✅ Playing Effect Animation */
 .playing-effect {
   width: 12px;
   height: 12px;
@@ -107,43 +161,10 @@ body {
   padding: 0;
 }
 
-/* ✅ Navbar Styling */
-.g1 {
-  display: flex;
-  align-items: center;
-  list-style-type: none;
-  height: 70px;
-  background-color: black;
-  padding: 0 20px;
-  justify-content: space-between;
-}
-
-.g1 li {
-  padding: 0 12px;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-
-.g1 li:hover {
-  color: #1db954;
-}
-
-/* ✅ Brand Styling */
-.brand img {
-  width: 44px;
-  padding-right: 10px;
-}
-
-.brand {
-  display: flex;
-  align-items: center;
-  font-weight: bold;
-  font-size: 1.3rem;
-  color: red;
-}
-
 /* ✅ Page Content */
 .page {
+  padding: 20px;
+  background-color: #f7f7f7;
   min-height: 75vh;
   display: flex;
   flex-direction: column;
@@ -151,11 +172,14 @@ body {
   margin: 10px auto;
   width: 80%;
   border-radius: 12px;
-  padding: 20px;
   background: linear-gradient(to right, #2e2e2e, #1c1c1c);
   background-image: url(./img/bg2.jpg);
   background-size: cover;
   background-repeat: no-repeat;
+}
+
+.hero {
+  text-align: center;
 }
 
 /* ✅ Bottom Player */
@@ -165,19 +189,28 @@ body {
   left: 0;
   width: 100%;
   height: 100px;
-  background-color: black;
+  background-color: #282828;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  color: white;
+  text-align: center;
+  padding: 10px;
 }
 
 /* ✅ Player Icons */
+.icons {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
 .icons i {
+  margin: 0 20px;
   cursor: pointer;
-  margin: 0 15px;
-  transition: 0.2s;
   font-size: 24px;
+  transition: 0.2s;
 }
 
 .icons i:hover {
@@ -187,8 +220,8 @@ body {
 
 /* ✅ Song Info */
 .songInfo {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 16px;
+  margin-top: 5px;
   animation: fadeIn 1s ease-in-out;
 }
 
