@@ -30,7 +30,7 @@ body {
 .navbar-list {
   display: flex;
   align-items: center;
-  gap: 20px; /* Spacing between items */
+  gap: 40px; /* Spacing between items */
   list-style: none;
   margin: 0;
   padding: 0;
