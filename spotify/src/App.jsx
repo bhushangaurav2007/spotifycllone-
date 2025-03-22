@@ -8,6 +8,8 @@ const App = () => {
   const [songs, setSongs] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredSongs, setFilteredSongs] = useState([]);
   const [error, setError] = useState(null);
   const audioRef = useRef(null);
   const scrollRefs = useRef([]); // ✅ Array of refs for multiple rows
@@ -22,10 +24,20 @@ const App = () => {
       .then((data) => {
         const validSongs = data.filter((song) => song.filePath);
         setSongs(validSongs);
+        setFilteredSongs(validSongs); // Initially show all songs
         setError(null);
       })
       .catch((err) => setError(err.message));
   }, []);
+
+  // ✅ Handle search query change
+  const handleSearchChange = (e) => {
+    setSearchQuery(e.target.value);
+    const filtered = songs.filter((song) =>
+      song.title.toLowerCase().includes(e.target.value.toLowerCase())
+    );
+    setFilteredSongs(filtered);
+  };
 
   // ✅ Play song when currentIndex changes
   useEffect(() => {
@@ -100,7 +112,7 @@ const App = () => {
     return result;
   };
 
-  const songGroups = chunkSongs(songs, 5); // ✅ Grouping songs into rows
+  const songGroups = chunkSongs(filteredSongs, 5); // ✅ Grouping songs into rows
 
   // 🔹 Auto-play and auto-scroll effect when songs load
   useEffect(() => {
@@ -120,8 +132,8 @@ const App = () => {
   return (
     <div>
       {/* 🔹 Navbar */}
-      <nav>
-        <ul className="g1">
+      <nav className="navbar">
+        <ul className="navbar-list">
           <li className="brand">
             <img src="./2.png" alt="Spotify" />
             BGKK-SONGS
@@ -129,16 +141,14 @@ const App = () => {
           <li className="search-container">
             <input
               type="search"
-              name="Search A Songs"
-              id="ser"
+              className="search-bar"
+              placeholder="Search songs..."
               value={searchQuery}
               onChange={handleSearchChange}
-              placeholder="Search songs..."
             />
             <i
-              className="fa-solid fa-magnifying-glass"
+              className="fa-solid fa-magnifying-glass search-icon"
               style={{ color: "#ff3d3d", cursor: "pointer" }}
-              onClick={handleSearchClick}
             ></i>
           </li>
           <li>Home</li>
@@ -157,13 +167,12 @@ const App = () => {
           {songGroups.map((group, rowIndex) => (
             <div className="scroll-container" key={rowIndex}>
               <button className="scroll-btn left" onClick={() => scrollLeft(rowIndex)}>◀</button>
-              
               <div className="songList" ref={(el) => (scrollRefs.current[rowIndex] = el)}>
                 {group.map((song, songIndex) => {
-                  const absoluteIndex = rowIndex * 8 + songIndex; // ✅ Calculate absolute index
+                  const absoluteIndex = rowIndex * 5 + songIndex; // ✅ Calculate absolute index
                   return (
                     <div
-                      className={`s1 ${absoluteIndex === currentIndex ? "active playing" : ""}`}
+                      className={`song-item ${absoluteIndex === currentIndex ? "active playing" : ""}`}
                       key={absoluteIndex}
                       onClick={() => playSong(absoluteIndex)}
                     >
@@ -173,7 +182,6 @@ const App = () => {
                   );
                 })}
               </div>
-
               <button className="scroll-btn right" onClick={() => scrollRight(rowIndex)}>▶</button>
             </div>
           ))}
@@ -186,7 +194,6 @@ const App = () => {
           <>
             <audio
               ref={audioRef}
-              src={songs[currentIndex].filePath}
               controls
               autoPlay
               onEnded={playNext}
@@ -195,9 +202,7 @@ const App = () => {
             <div className="icons">
               <i className="fa-solid fa-3x fa-backward-step" onClick={playPrev}></i>
               <i
-                className={`fa-regular fa-3x ${
-                  isPlaying ? "fa-circle-pause" : "fa-circle-play"
-                }`}
+                className={`fa-regular fa-3x ${isPlaying ? "fa-circle-pause" : "fa-circle-play"}`}
                 onClick={togglePlayPause}
               ></i>
               <i className="fa-solid fa-3x fa-forward-step" onClick={playNext}></i>
