@@ -8,7 +8,7 @@ const App = () => {
   const [songs, setSongs] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // ✅ Ensure searchQuery is properly defined
   const [filteredSongs, setFilteredSongs] = useState([]);
   const [error, setError] = useState(null);
   const audioRef = useRef(null);
@@ -32,11 +32,12 @@ const App = () => {
 
   // ✅ Handle search query change
   const handleSearchChange = (e) => {
-    setSearchQuery(e.target.value);
+    const query = e.target.value; // Capture the value
+    setSearchQuery(query); // Update searchQuery state
     const filtered = songs.filter((song) =>
-      song.title.toLowerCase().includes(e.target.value.toLowerCase())
+      song.title.toLowerCase().includes(query.toLowerCase())
     );
-    setFilteredSongs(filtered);
+    setFilteredSongs(filtered); // Update filteredSongs based on the query
   };
 
   // ✅ Play song when currentIndex changes
@@ -143,7 +144,7 @@ const App = () => {
               type="search"
               className="search-bar"
               placeholder="Search songs..."
-              value={searchQuery}
+              value={searchQuery} // ✅ Controlled input
               onChange={handleSearchChange}
             />
             <i
