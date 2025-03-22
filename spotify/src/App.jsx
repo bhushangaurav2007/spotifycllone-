@@ -126,6 +126,21 @@ const App = () => {
             <img src="./2.png" alt="Spotify" />
             BGKK-SONGS
           </li>
+          <li className="search-container">
+            <input
+              type="search"
+              name="Search A Songs"
+              id="ser"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search songs..."
+            />
+            <i
+              className="fa-solid fa-magnifying-glass"
+              style={{ color: "#ff3d3d", cursor: "pointer" }}
+              onClick={handleSearchClick}
+            ></i>
+          </li>
           <li>Home</li>
           <li>About</li>
         </ul>
